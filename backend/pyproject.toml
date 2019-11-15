@@ -29,6 +29,12 @@ marshmallow = "^3.2"
 flask-socketio = "^4.2"
 eventlet = "^0.25.1"
 qrcode = {version = "^6.1", extras = ["pil"]}
+google-cloud-vision = "^0.40.0"
+jupyter = "^1.0"
+grpcio = "^1.25"
+grpcio-tools = "^1.25"
+opencv-python = "^4.1"
+matplotlib = "^3.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.8"
