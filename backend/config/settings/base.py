@@ -59,7 +59,7 @@ JWT_TOKEN_LOCATION = ('headers',)
 JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(
     seconds=env.int(
         'JWT_ACCESS_TOKEN_EXPIRES',
-        default=datetime.timedelta(hours=5).total_seconds(),
+        default=datetime.timedelta(hours=24).total_seconds(),
     ),
 )
 JWT_SECRET_KEY = env('JWT_SECRET_KEY', default='')
