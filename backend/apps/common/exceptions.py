@@ -12,7 +12,7 @@ from marshmallow import ValidationError
 @current_app.errorhandler(ValidationError)
 def handle_marshmallo_ValidationError(exception):
     return Response(
-        json.dumps(exception.data),
+        json.dumps(exception.normalized_messages()),
         HTTPStatus.BAD_REQUEST,
         headers={'Content-Type': 'application/json'},
     )

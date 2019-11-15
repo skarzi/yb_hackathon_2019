@@ -5,7 +5,7 @@ from ..extensions import schemas
 
 
 class AuthLoginSchema(schemas.Schema):
-    email = fields.Email(
+    username = fields.Str(
         required=True,
         validate=[validators.Length(min=3, max=255)],
     )
@@ -15,5 +15,5 @@ class AuthLoginSchema(schemas.Schema):
     )
 
     class Meta:
-        fields = ('email', 'password')
+        fields = ('username', 'password')
         load_only = fields
