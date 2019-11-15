@@ -2,7 +2,7 @@
 const baseUrl = "http://vps.skarzi.com"
 const baseUsersUrl = "users";
 const baseTokenUrl = "users/auth/tokens";
-
+const baseQuestion = "questions/random";
 let cachedToken = "";
 // Create a user through the API
 export const createUser = async (username, password) => {
@@ -45,4 +45,52 @@ export const getToken = async (username, password) => {
   }
   
   throw new Error(`HTTP Request getToken failed with status code ${response.status}`);
+}
+
+export const getQuestion = async (token) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the getQuestion function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/${baseQuestion}`, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json();  
+    let options = [];
+    for (let answer of responseJson.options) {
+      options.push( { key: answer });
+    }
+
+    return { 
+      correct_answer: responseJson.correct_answer,
+      image_url: responseJson.image_url,
+      options,
+      reward: responseJson.reward,
+      text: responseJson.text,
+    };
+  }
+  
+  throw new Error(`HTTP Request getToken failed with status code ${response.status}`);
+}
+
+export const getSavedImagesAndPrices = async (token) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the getQuestion function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}`, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+  });
 }
