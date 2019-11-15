@@ -1,3 +1,4 @@
+import json
 import uuid
 
 from http import HTTPStatus
@@ -20,6 +21,7 @@ from ..extensions import db
 from . import (
     models,
     schemas,
+    utils,
 )
 
 
@@ -74,8 +76,13 @@ class UserCreateListChildrenView(APIView):
         child.parents.append(current_user)
         db.session.add(child)
         db.session.commit()
+        response_data = schemas.UserSchema(exclude=('password',)).dump(child)
+        response_data['access_token_qr_code'] = utils.qr_code_with_access_token_for(
+            child,
+            stringify=True,
+        )
         return Response(
-            schemas.UserSchema(exclude=('password',)).dumps(child),
+            json.dumps(response_data),
             HTTPStatus.CREATED,
             headers={
                 'Location': url_for('.user-detail', user_id=str(child.id)),
