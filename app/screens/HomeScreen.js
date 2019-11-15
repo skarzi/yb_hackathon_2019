@@ -1,7 +1,8 @@
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
-  Image,
+  FlatList,
+  Image,  
   Platform,
   ScrollView,
   StyleSheet,
@@ -29,30 +30,22 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.getStartedContainer}>
-          <Text style={styles.getStartedText}>iTeacher</Text>
+          <Text style={styles.getStartedText}>Piggee Bank</Text>
         </View>
 
         <View style={styles.helpContainer}>
-          <TouchableOpacity style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>
-              Some cool text
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.helpLinkText}>
+            Welcome to this demo app of the Piggee Bank concept. The Piggee Bank is a digital wallet for your kid(s) to learn to spend money responsible. To get started:
+          </Text>
+          <FlatList
+            data={[{key: '1. add some objects and their prices'}, {key: '2. assign some credit to your kid(s)'}]}
+            renderItem={({item}) => <Text style={styles.helpLinkText}>{item.key}</Text>}
+          />
+          <Text style={styles.helpLinkText}>
+            Then, enjoy playing with them to teach them responsible spending!
+          </Text>
         </View>
       </ScrollView>
-
-      <View style={styles.tabBarInfoContainer}>
-        <Text style={styles.tabBarInfoText}>
-          This is a tab bar. You can edit it in:
-        </Text>
-
-        <View
-          style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-          <MonoText style={styles.codeHighlightText}>
-            navigation/MainTabNavigator.js
-          </MonoText>
-        </View>
-      </View>
     </View>
   );
 }
@@ -107,7 +100,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
-    textAlign: 'center',
+    textAlign: 'left',
+    fontWeight: 'bold',
   },
   tabBarInfoContainer: {
     position: 'absolute',
@@ -139,13 +133,15 @@ const styles = StyleSheet.create({
   },
   helpContainer: {
     marginTop: 15,
+
     alignItems: 'center',
   },
   helpLink: {
     paddingVertical: 15,
   },
   helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+    fontSize: 20,
+    padding: 20,
+    color: '#000',
   },
 });
