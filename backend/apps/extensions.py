@@ -1,3 +1,4 @@
+from flask_admin import Admin
 from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -13,3 +14,4 @@ jwt = JWTManager()
 # TODO: uncomment for socketio support
 # from .common.extensions.socketio import SocketIO
 # socketio = SocketIO()
+admin = Admin()

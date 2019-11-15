@@ -9,6 +9,7 @@ BLUEPRINT_RELATIVE_IMPORTS = {
     '.models': (),
     '.hooks': (),
     '.exceptions': (),
+    '.admins': (),
 }
 
 

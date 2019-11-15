@@ -1,3 +1,6 @@
+import json
+import uuid
+
 from http import HTTPStatus
 
 from flask import (
@@ -18,6 +21,7 @@ from ..extensions import db
 from . import (
     models,
     schemas,
+    utils,
 )
 
 
@@ -43,12 +47,45 @@ class UserRetrieveView(APIView):
         if user_id == 'self':
             user = current_user
         else:
-            try:
-                user = models.User.query.get(user_id)
-            except NoResultFound:
-                raise
+            user = models.User.query.get(user_id)
+        schema_class = schemas.ParentSchema
+        if user.is_child:
+            schema_class = schemas.ChildSchema
         return Response(
-            schemas.UserSchema().dumps(user),
+            schema_class().dumps(user),
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
+        )
+
+
+class UserCreateListChildrenView(APIView):
+    method_decorators = [jwt_required]
+
+    def get(self):
+        return Response(
+            schemas.UserSchema(many=True).dumps(current_user.children),
+            HTTPStatus.OK,
+            headers={'Content-Type': 'application/json'},
+        )
+
+    def post(self):
+        data = dict(request.json)
+        data['is_child'] = True
+        data['password'] = uuid.uuid4().hex
+        child = schemas.UserSchema().load(data)
+        child.parents.append(current_user)
+        db.session.add(child)
+        db.session.commit()
+        response_data = schemas.UserSchema(exclude=('password',)).dump(child)
+        response_data['access_token_qr_code'] = utils.qr_code_with_access_token_for(
+            child,
+            stringify=True,
+        )
+        return Response(
+            json.dumps(response_data),
+            HTTPStatus.CREATED,
+            headers={
+                'Location': url_for('.user-detail', user_id=str(child.id)),
+                'Content-Type': 'application/json',
+            },
         )
