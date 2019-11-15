@@ -28,7 +28,7 @@ class TransactionSchema(schemas.ModelSchema):
     detection_object =  Nested(DetectionObjectSchema)
 
     class Meta:
-        model = models.DetectionObject
+        model = models.Transaction
         fields = (
             'id',
             'created_at',
