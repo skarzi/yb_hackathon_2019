@@ -9,7 +9,7 @@ export default class GameScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      questionImage: '',
+      questionImage: 'https://miro.medium.com/max/1080/0*DqHGYPBA-ANwsma2.gif',
       questionString: '',
       questionOptions: [],
       questionAnswer: 0,
