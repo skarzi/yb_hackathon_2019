@@ -22,6 +22,7 @@ INSTALLED_BLUEPRINTS = (
     'apps.auth:auth_app',
     'apps.users:users_app',
     'apps.detections:detections_app',
+    'apps.games:games_app',
 )
 
 
