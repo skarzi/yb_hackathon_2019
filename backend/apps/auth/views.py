@@ -36,7 +36,7 @@ class AuthJWTTokenCreateView(APIView):
             headers={'Content-Type': 'application/json'},
         )
         try:
-            user = User.query.filter_by(email=data['email']).one()
+            user = User.query.filter_by(username=data['username']).one()
         except (NoResultFound, MultipleResultsFound):
             return invalid_credentials_response
         if user.password != data['password']:
