@@ -72,3 +72,31 @@ class ObjectDetectionView(APIView):
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
+
+
+class DetectionObjectCreateListView(APIView):
+    method_decorators = [jwt_required]
+
+    def post(self):
+        detection_object = schemas.DetectionObjectSchema().load(request.json)
+        db.session.add(detection_object)
+        db.session.commit()
+        return Response(
+            schemas.DetectionObjectSchema().dumps(detection_object),
+            HTTPStatus.CREATED,
+            headers={'Content-Type': 'application/json'},
+        )
+
+    def get(self):
+        filter_args = []
+        label = request.args.get('label', '')
+        if label:
+            filter_args.append(
+                models.DetectionObject.label.ilike(f'%{label}%'),
+            )
+        detection_objects = models.DetectionObject.query.filter(*filter_args)
+        return Response(
+            schemas.DetectionObjectSchema(many=True).dumps(detection_objects),
+            HTTPStatus.OK,
+            headers={'Content-Type': 'application/json'},
+        )
