@@ -129,3 +129,6 @@ dmypy.json
 
 # Matts temporary venv
 my_env/
+
+# GCP credentials
+config/*_credentials.json

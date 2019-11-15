@@ -10,3 +10,6 @@ FLASK_DEBUG=True
 FLASK_ENN=development
 FLASK_SECRET_KEY=super_secret_value
 FLASK_SERVER_NAME=localhost:8000
+
+# GCP
+GOOGLE_APPLICATION_CREDENTIALS=/app/config/gcp_credentials.json

@@ -1,3 +1,5 @@
+import base64
+import io
 import json
 
 from http import HTTPStatus
@@ -22,6 +24,7 @@ from . import (
     models,
     schemas,
 )
+from .gcv_api import VisionClient
 
 
 class TransactionCreateListView(APIView):
@@ -52,6 +55,20 @@ class TransactionCreateListView(APIView):
         # user.transactions: typing.List[Transaction]
         return Response(
             schemas.TransactionSchema(many=True).dumps(transactions),
+            HTTPStatus.OK,
+            headers={'Content-Type': 'application/json'},
+        )
+
+
+
+class ObjectDetectionView(APIView):
+    def post(self):
+        base64_encoded_image = request.json['image']
+        image_data = base64.b64decode(base64_encoded_image)
+        vision_client = VisionClient()
+        response_data = vision_client.localize_objects(image_data)
+        return Response(
+            json.dumps(response_data),
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
