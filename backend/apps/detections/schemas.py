@@ -13,12 +13,8 @@ class DetectionObjectSchema(schemas.ModelSchema):
         model = models.DetectionObject
         fields = (
             'id',
-            'x_pos',
-            'y_pos',
-            'width',
-            'height',
             'label',
-            'score',
+            'price',
             'created_at',
         )
 

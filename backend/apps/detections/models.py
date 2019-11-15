@@ -23,15 +23,11 @@ from . import enums
 
 
 class DetectionObject(Timestampable, UUIDable):
-    x_pos = Column(Integer)
-    y_pos = Column(Integer)
-    width = Column(Integer)
-    height = Column(Integer)
     label = Column(String)
-    score = Column(Float)
+    price = Column(Float)
 
     def __str__(self) -> str:
-        return f'{self.label}[{self.score}%]'
+        return f'{self.label} - {self.price}$'
 
 
 
@@ -56,3 +52,10 @@ class Transaction(Timestampable, UUIDable):
         User,
         backref='transactions',
     )
+
+    def __str__(self) -> str:
+        prefix = '-'
+        if self.type == enums.TransactionType.INCOME:
+            prefix = '+'
+        amount_slug = f'{prefix}{self.amount}$'
+        return f'{self.type.name} {amount_slug} by {self.user.username}'
