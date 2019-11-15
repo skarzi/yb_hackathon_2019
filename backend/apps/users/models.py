@@ -54,3 +54,7 @@ class User(Timestampable, UUIDable):
         secondaryjoin=f'User.id == ParentChildAssociation.parent_id',
         backref='children',
     )
+
+    def __str__(self) -> str:
+        prefix = '[C] ' if self.is_child else '[P] '
+        return f'{prefix}{self.username}'
