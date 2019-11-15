@@ -1,3 +1,5 @@
+import typing
+
 from flask import current_app
 
 from sqlalchemy import (
@@ -11,11 +13,13 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from apps.common.models import UUIDable
+from . import upload_sets
 
 
 class Question(UUIDable):
     text = Column(String, nullable=False)
     reward = Column(Float, default=1, nullable=False)
+    image_filename = Column(String(length=255), unique=True)
 
     options = relationship(
         'Answer',
@@ -29,6 +33,16 @@ class Question(UUIDable):
     @property
     def correct_answer(self) -> 'Answer':
         return next(answer for answer in self.options if answer.is_correct)
+
+    @property
+    def image_url(self):
+        return upload_sets.questions.url(self.image_filename)
+
+    @property
+    def image_path(self):
+        if self.image_filename is None:
+            return
+        return upload_sets.questions.path(self.image_filename)
 
 
 class Answer(UUIDable):
