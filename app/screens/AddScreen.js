@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity, Text, Slider } from 'react-native';
+import { FlatList, Image as ImageNative, ScrollView, StyleSheet, View, TouchableOpacity, Text, Slider } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
+import { getSavedImagesAndPrices } from "../authentication/Authentication.js";
 import * as ImageManipulator from 'expo-image-manipulator';
 import Svg, {Image, Rect} from 'react-native-svg';
 
@@ -14,6 +15,26 @@ export default class AddScreen extends React.Component {
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
+    await this.updateImagesAndPrices();
+  }
+
+  updateImagesAndPrices = async() => {
+    const imagesAndPrices = [ // await getSavedImagesAndPrices();
+      { key: 0, image: 'http://thumbs.dreamstime.com/z/close-up-angry-chihuahua-growling-2-years-old-15126199.jpg', price: 10, name: 'Dog' },
+      { key: 1, image: 'http://thumbs.dreamstime.com/z/close-up-angry-chihuahua-growling-2-years-old-15126199.jpg', price: 20, name: 'Dog' },
+    ];
+    this.setState({ imagesAndPrices });
+  }
+
+  renderImageAndPrice = ({ item, index }) => {
+    return (
+      <View style={styles.containerImage}>
+        <ImageNative style={{width: "50%", height: 120}} source={{uri: item.image}}/>
+        <Text>
+          {item.name}: {item.price}$
+        </Text>
+      </View>
+    )
   }
 
   takePhoto = async() => {
@@ -89,6 +110,13 @@ export default class AddScreen extends React.Component {
           <TouchableOpacity style={styles.button} onPress={this.takePhoto}>
             <Text style={styles.buttonText}>Take photo</Text>
           </TouchableOpacity>
+          <Text style={styles.header}>Objects Added</Text>
+          <FlatList
+            numColumns={2}
+            contentContainerStyle={styles.list}
+            data={this.state.imagesAndPrices}
+            renderItem={this.renderImageAndPrice}
+          />
         </ScrollView>
       );
     }
@@ -137,6 +165,13 @@ export default class AddScreen extends React.Component {
             <Text style={styles.buttonText}>Take another photo</Text>
         </TouchableOpacity>
         {objectSelection}
+        <Text style={styles.header}>Objects Added</Text>
+        <FlatList
+          numColumns={2}
+          contentContainerStyle={styles.list}
+          data={this.state.imagesAndPrices}
+          renderItem={this.renderImageAndPrice}
+        />
       </ScrollView>      
     );
   }
@@ -149,7 +184,6 @@ AddScreen.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 15,
     backgroundColor: '#fff',
   },
   optionView: {
@@ -168,5 +202,29 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20
-  }
+  },
+  list: {
+    justifyContent: 'center',
+  },
+  containerImage: {
+    flex: 1,
+    paddingTop: 0,
+    backgroundColor: '#fff',
+    alignSelf: 'center',
+    paddingTop:10,
+  },
+  header: {
+    paddingTop:15,
+    textAlign:'center',
+    fontWeight:'bold',
+    fontSize:18,
+  },
+  imageItem: {
+    margin: "1%",
+    width: "48%",
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderColor: '#CCC',
+    borderWidth: 1,
+  },
 });
