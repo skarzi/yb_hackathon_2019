@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import AddScreen from '../screens/AddScreen';
 import StatsScreen from '../screens/StatsScreen';
 import GameScreen from '../screens/GameScreen';
+import MainWishListScreen from '../screens/wishlist/MainScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -85,11 +86,26 @@ GameStack.navigationOptions = {
 GameStack.path = '';
 
 
+const WishListStack = createStackNavigator(
+  {
+    Stats: MainWishListScreen,
+  },
+  config
+);
+
+WishListStack.navigationOptions = {
+  tabBarLabel: 'Wish List',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-basketball' : 'md-basketball'} />
+  ),
+};
+
 const tabNavigator = createBottomTabNavigator({
   HomeStack,
   AddStack,
   StatsStack,
   GameStack,
+  WishListStack,
 });
 
 tabNavigator.path = '';
