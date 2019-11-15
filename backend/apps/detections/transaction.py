@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from enum import Enum
 
 from backend.apps.detections.date_time_utils import DateTimeRange, date_time_to_str
 
@@ -45,7 +46,6 @@ class Income(Transaction):
     #def trans_obj(self):
     #    raise RuntimeError('An Income is not related to a detection / transaction object.')
 
-
 class TransactionHistory:
     def __init__(self, transactions: List[Transaction] = None):
         self.transactions = transactions if transactions else []
@@ -65,19 +65,19 @@ class TransactionHistory:
     def date_time_range(self) -> DateTimeRange:
         return DateTimeRange(start=self.start_date_time, end=self.end_date_time)
 
-    def _get_transactions_in_range(self, date_time_range: DateTimeRange, type_filter) -> List[Transaction]:
+    def get_transactions_in_range(self, date_time_range: DateTimeRange, type_filter) -> List[Transaction]:
         for transaction in self.transactions:
             if isinstance(transaction, type_filter) and date_time_range.contains(transaction.created_at):
                 yield transaction
 
     def get_expenses_in_range(self, date_time_range: DateTimeRange) -> List[Expense]:
-        yield from self._get_transactions_in_range(date_time_range, type_filter=Expense)
+        yield from self.get_transactions_in_range(date_time_range, type_filter=Expense)
 
     def get_rejections_in_range(self, date_time_range: DateTimeRange) -> List[Rejection]:
-        yield from self._get_transactions_in_range(date_time_range, type_filter=Rejection)
+        yield from self.get_transactions_in_range(date_time_range, type_filter=Rejection)
 
     def get_incomes_in_range(self, date_time_range: DateTimeRange) -> List[Income]:
-        yield from self._get_transactions_in_range(date_time_range, type_filter=Income)
+        yield from self.get_transactions_in_range(date_time_range, type_filter=Income)
 
     def get_total_expense_in_range(self, date_time_range: DateTimeRange) -> float:
         return sum([exp.amount for exp in self.get_expenses_in_range(date_time_range)])
@@ -87,6 +87,9 @@ class TransactionHistory:
 
     def get_total_income_in_range(self, date_time_range: DateTimeRange) -> float:
         return sum([inc.amount for inc in self.get_incomes_in_range(date_time_range)])
+
+    def num_of_transactions(self, date_time_range: DateTimeRange, transaction_type) -> int:
+        return len(self.get_transactions_in_range(date_time_range, transaction_type))
 
     def get_summary(self, date_time_range: DateTimeRange) -> dict:
         summary = {}
