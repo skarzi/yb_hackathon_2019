@@ -6,6 +6,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import AddScreen from '../screens/AddScreen';
 import StatsScreen from '../screens/StatsScreen';
+import GameScreen from '../screens/GameScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -67,10 +68,28 @@ StatsStack.navigationOptions = {
 
 StatsStack.path = '';
 
+const GameStack = createStackNavigator(
+  {
+    Stats: GameScreen,
+  },
+  config
+);
+
+GameStack.navigationOptions = {
+  tabBarLabel: 'Game',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-basketball' : 'md-basketball'} />
+  ),
+};
+
+GameStack.path = '';
+
+
 const tabNavigator = createBottomTabNavigator({
   HomeStack,
   AddStack,
   StatsStack,
+  GameStack,
 });
 
 tabNavigator.path = '';

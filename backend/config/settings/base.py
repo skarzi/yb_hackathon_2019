@@ -22,6 +22,7 @@ INSTALLED_BLUEPRINTS = (
     'apps.auth:auth_app',
     'apps.users:users_app',
     'apps.detections:detections_app',
+    'apps.games:games_app',
 )
 
 
@@ -45,6 +46,7 @@ MIDDLEWARE = []
 
 # HTTP
 JSON_SORT_KEYS = False
+SERVER_NAME = env('FLASK_SERVER_NAME', default='')
 
 
 # SECURITY
@@ -91,3 +93,8 @@ SOCKETIO_ASYNC_MODE = env('SOCKETIO_ASYNC_MODE', default='eventlet')
 SOCKETIO_CORS_ALLOWED_ORIGINS = '*'
 SOCKETIO_CORS_CREDENTIALS = True
 SOCKETIO_ALWAYS_CONNECT = False
+
+
+# FLASK-UPLOADS
+UPLOADED_FILES_DEST = str(APPS_DIR.path('shared', 'media'))
+UPLOADS_DEFAULT_DEST = UPLOADED_FILES_DEST

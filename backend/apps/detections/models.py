@@ -27,8 +27,12 @@ class DetectionObject(Timestampable, UUIDable):
     y_pos = Column(Integer)
     width = Column(Integer)
     height = Column(Integer)
-    label = Column(String, unique=True)
+    label = Column(String)
     score = Column(Float)
+
+    def __str__(self) -> str:
+        return f'{self.label}[{self.score}%]'
+
 
 
 class Transaction(Timestampable, UUIDable):
