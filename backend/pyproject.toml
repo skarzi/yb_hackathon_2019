@@ -29,6 +29,7 @@ marshmallow = "^3.2"
 flask-socketio = "^4.2"
 eventlet = "^0.25.1"
 qrcode = {version = "^6.1", extras = ["pil"]}
+flask-admin = "^1.5"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.8"

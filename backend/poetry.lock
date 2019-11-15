@@ -249,6 +249,18 @@ itsdangerous = ">=0.24"
 
 [[package]]
 category = "main"
+description = "Simple and extensible admin interface framework for Flask"
+name = "flask-admin"
+optional = false
+python-versions = "*"
+version = "1.5.4"
+
+[package.dependencies]
+Flask = ">=0.7"
+wtforms = "*"
+
+[[package]]
+category = "main"
 description = "Extended JWT integration with Flask"
 name = "flask-jwt-extended"
 optional = false
@@ -990,6 +1002,14 @@ python-versions = "*"
 version = "1.11.2"
 
 [[package]]
+category = "main"
+description = "A flexible forms validation and rendering library for Python web development."
+name = "wtforms"
+optional = false
+python-versions = "*"
+version = "2.2.1"
+
+[[package]]
 category = "dev"
 description = "A linter for YAML files."
 name = "yamllint"
@@ -1013,7 +1033,7 @@ version = "0.6.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "47bbb22806a6bde1cf969e119712f1aee554c0fd743d658bc99abce6d760ab49"
+content-hash = "8d351f23cab5e401ad018eef7e9c07b956870f82302c701f338a7048520cd70d"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -1040,6 +1060,7 @@ eventlet = ["658b1cd80937adc1a4860de2841e0528f64e2ca672885c4e00fc0e2217bde6b1", 
 factory-boy = ["728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee", "faf48d608a1735f0d0a3c9cbf536d64f9132b547dae7ba452c4d99a79e84a370"]
 faker = ["48c03580720e0b46538d528b1296e4e5b24a809dcaf33a7dddec719489a9edb8", "6327c665c0d8721280b3036d9c9e851c60092bc1f30c8394cc433f8723e2bda5"]
 flask = ["13f9f196f330c7c2c5d7a5cf91af894110ca0215ac051b5844701f2bfd934d52", "45eb5a6fd193d6cf7e0cf5d8a5b31f83d5faae0293695626f539a823e93b13f6"]
+flask-admin = ["ed7b256471dba0f3af74f1a315733c3b36244592f2002c3bbdc65fd7c2aa807a"]
 flask-jwt-extended = ["0aa8ee6fa7eb3be9314e39dd199ac8e19389a95371f9d54e155c7aa635e319dd"]
 flask-marshmallow = ["4f507f883838b397638a3a36c7d36ee146b255a49db952f5d9de3f6f4522e8a8", "69e99e3a123393894884a032ae2d11e6bdf4519a505819b66cec7eda32057741"]
 flask-migrate = ["6fb038be63d4c60727d5dfa5f581a6189af5b4e2925bc378697b4f0a40cfb4e1", "a96ff1875a49a40bd3e8ac04fce73fdb0870b9211e6168608cbafa4eb839d502"]
@@ -1113,5 +1134,6 @@ vine = ["133ee6d7a9016f177ddeaf191c1f58421a1dcc6ee9a42c58b34bed40e1d2cd87", "ea4
 wcwidth = ["3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e", "f4ebe71925af7b40a864553f761ed559b43544f8f71746c2d756c7fe788ade7c"]
 werkzeug = ["7280924747b5733b246fe23972186c6b348f9ae29724135a6dfc1e53cea433e7", "e5f4a1f98b52b18a93da705a7458e55afb26f32bff83ff5d19189f92462d65c4"]
 wrapt = ["565a021fd19419476b9362b05eeaa094178de64f8361e44468f9e9d7843901e1"]
+wtforms = ["0cdbac3e7f6878086c334aa25dc5a33869a3954e9d1e015130d65a69309b3b61", "e3ee092c827582c50877cdbd49e9ce6d2c5c1f6561f849b3b068c1b8029626f1"]
 yamllint = ["24f05b7ff1a604120eeb5ff7afb7ed8792253bfa96ee83db9cec6d5c20feaf64", "d42dbb35b3d28722a8c5c25de4593add0a6215b2732eb6932d89f38482c3d01c"]
 zipp = ["3718b1cbcd963c7d4c5511a8240812904164b7f381b647143a89d3b98f9bcd8e", "f06903e9f1f43b12d371004b4ac7b06ab39a44adc747266928ae6debfa7b3335"]
