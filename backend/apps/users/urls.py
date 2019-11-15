@@ -13,3 +13,8 @@ users_app.add_url_rule(
     'user-list',
     views.UserCreateView.as_view('user-list'),
 )
+users_app.add_url_rule(
+    '/self/children',
+    'user-children-list',
+    views.UserCreateListChildrenView.as_view('user-children-list'),
+)

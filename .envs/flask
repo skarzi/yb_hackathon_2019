@@ -8,4 +8,4 @@ FLASK_SETTINGS_MODULE=config.settings.local
 FLASK_APP=apps.application
 FLASK_DEBUG=True
 FLASK_ENN=development
-# FLASK_SECRET_KEY=super_secret_value
+FLASK_SECRET_KEY=super_secret_value
