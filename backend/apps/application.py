@@ -32,6 +32,7 @@ def create_app(config_module_path: str = ''):
     # TODO: uncomment to run socket.io
     # extensions.socketio.init_app(flask_app)
     extensions.admin.init_app(flask_app)
+    extensions.cors.init_app(flask_app)
 
     with flask_app.app_context():
         import_module('apps.common.exceptions')

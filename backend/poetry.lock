@@ -261,6 +261,18 @@ wtforms = "*"
 
 [[package]]
 category = "main"
+description = "A Flask extension adding a decorator for CORS support"
+name = "flask-cors"
+optional = false
+python-versions = "*"
+version = "3.0.8"
+
+[package.dependencies]
+Flask = ">=0.9"
+Six = "*"
+
+[[package]]
+category = "main"
 description = "Extended JWT integration with Flask"
 name = "flask-jwt-extended"
 optional = false
@@ -335,6 +347,17 @@ version = "2.4.1"
 [package.dependencies]
 Flask = ">=0.10"
 SQLAlchemy = ">=0.8.0"
+
+[[package]]
+category = "main"
+description = "Flexible and efficient upload handling for Flask"
+name = "flask-uploads"
+optional = false
+python-versions = "*"
+version = "0.2.1"
+
+[package.dependencies]
+Flask = ">=0.8.0"
 
 [[package]]
 category = "main"
@@ -1033,7 +1056,7 @@ version = "0.6.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "8d351f23cab5e401ad018eef7e9c07b956870f82302c701f338a7048520cd70d"
+content-hash = "860c91db1877e8aac01490eddefdd1acc9f9662be8381aa30323dcf7fc48d0a7"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -1061,12 +1084,14 @@ factory-boy = ["728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee
 faker = ["48c03580720e0b46538d528b1296e4e5b24a809dcaf33a7dddec719489a9edb8", "6327c665c0d8721280b3036d9c9e851c60092bc1f30c8394cc433f8723e2bda5"]
 flask = ["13f9f196f330c7c2c5d7a5cf91af894110ca0215ac051b5844701f2bfd934d52", "45eb5a6fd193d6cf7e0cf5d8a5b31f83d5faae0293695626f539a823e93b13f6"]
 flask-admin = ["ed7b256471dba0f3af74f1a315733c3b36244592f2002c3bbdc65fd7c2aa807a"]
+flask-cors = ["72170423eb4612f0847318afff8c247b38bd516b7737adfc10d1c2cdbb382d16", "f4d97201660e6bbcff2d89d082b5b6d31abee04b1b3003ee073a6fd25ad1d69a"]
 flask-jwt-extended = ["0aa8ee6fa7eb3be9314e39dd199ac8e19389a95371f9d54e155c7aa635e319dd"]
 flask-marshmallow = ["4f507f883838b397638a3a36c7d36ee146b255a49db952f5d9de3f6f4522e8a8", "69e99e3a123393894884a032ae2d11e6bdf4519a505819b66cec7eda32057741"]
 flask-migrate = ["6fb038be63d4c60727d5dfa5f581a6189af5b4e2925bc378697b4f0a40cfb4e1", "a96ff1875a49a40bd3e8ac04fce73fdb0870b9211e6168608cbafa4eb839d502"]
 flask-shell-ipython = ["f212b4fad6831edf652799c719cd05fd0716edfaa5506eb41ff9ef09109890d3", "fb3b390f4dc03d7a960c62c5b51ce4deca19ceff77e4db3d4670012adc529ebd"]
 flask-socketio = ["2172dff1e42415ba480cee02c30c2fc833671ff326f1598ee3d69aa02cf768ec", "7ff5b2f5edde23e875a8b0abf868584e5706e11741557449bc5147df2cd78268"]
 flask-sqlalchemy = ["0078d8663330dc05a74bc72b3b6ddc441b9a744e2f56fe60af1a5bfc81334327", "6974785d913666587949f7c2946f7001e4fa2cb2d19f4e69ead02e4b8f50b33d"]
+flask-uploads = ["53ecbd6033667d50ae02b63adebbaa33c7fc56c09e5293025810cf9d841ecb02"]
 flower = ["7f45acb297ab7cf3dd40140816143a2588f6938dbd70b8c46b59c7d8d1e93d55"]
 greenlet = ["000546ad01e6389e98626c1367be58efa613fa82a1be98b0c6fc24b563acc6d0", "0d48200bc50cbf498716712129eef819b1729339e34c3ae71656964dac907c28", "23d12eacffa9d0f290c0fe0c4e81ba6d5f3a5b7ac3c30a5eaf0126bf4deda5c8", "37c9ba82bd82eb6a23c2e5acc03055c0e45697253b2393c9a50cef76a3985304", "51503524dd6f152ab4ad1fbd168fc6c30b5795e8c70be4410a64940b3abb55c0", "8041e2de00e745c0e05a502d6e6db310db7faa7c979b3a5877123548a4c0b214", "81fcd96a275209ef117e9ec91f75c731fa18dcfd9ffaa1c0adbdaa3616a86043", "853da4f9563d982e4121fed8c92eea1a4594a2299037b3034c3c898cb8e933d6", "8b4572c334593d449113f9dc8d19b93b7b271bdbe90ba7509eb178923327b625", "9416443e219356e3c31f1f918a91badf2e37acf297e2fa13d24d1cc2380f8fbc", "9854f612e1b59ec66804931df5add3b2d5ef0067748ea29dc60f0efdcda9a638", "99a26afdb82ea83a265137a398f570402aa1f2b5dfb4ac3300c026931817b163", "a19bf883b3384957e4a4a13e6bd1ae3d85ae87f4beb5957e35b0be287f12f4e4", "a9f145660588187ff835c55a7d2ddf6abfc570c2651c276d3d4be8a2766db490", "ac57fcdcfb0b73bb3203b58a14501abb7e5ff9ea5e2edfa06bb03035f0cff248", "bcb530089ff24f6458a81ac3fa699e8c00194208a724b644ecc68422e1111939", "beeabe25c3b704f7d56b573f7d2ff88fc99f0138e43480cecdfcaa3b87fe4f87", "d634a7ea1fc3380ff96f9e44d8d22f38418c1c381d5fac680b272d7d90883720", "d97b0661e1aead761f0ded3b769044bb00ed5d33e1ec865e891a8b128bf7c656"]
 importlib-metadata = ["aa18d7378b00b40847790e7c27e11673d7fed219354109d0e7b9e5b25dc3ad26", "d5f18a79777f3aa179c145737780282e27b508fc8fd688cb17c7a813e8bd39af"]
