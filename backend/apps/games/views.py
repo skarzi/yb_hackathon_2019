@@ -27,6 +27,7 @@ class QuestionRandomView(APIView):
         else:
             response_data = '{}'
         return Response(
+            response_data,
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
