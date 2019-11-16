@@ -19,15 +19,29 @@ from apps.common.models import (
 )
 from apps.users.models import User
 
-from . import enums
+from . import (
+    enums,
+    upload_sets,
+)
 
 
 class DetectionObject(Timestampable, UUIDable):
     label = Column(String)
     price = Column(Float)
+    image_filename = Column(String(length=255), unique=True)
 
     def __str__(self) -> str:
         return f'{self.label} - {self.price}$'
+
+    @property
+    def image_url(self):
+        return upload_sets.detections.url(self.image_filename)
+
+    @property
+    def image_path(self):
+        if self.image_filename is None:
+            return
+        return upload_sets.detections.path(self.image_filename)
 
 
 

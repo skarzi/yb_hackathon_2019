@@ -1,6 +1,7 @@
 import base64
 import io
 import json
+import uuid
 
 from http import HTTPStatus
 
@@ -15,6 +16,7 @@ from flask_jwt_extended import (
     jwt_required,
 )
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.datastructures import FileStorage
 
 from apps.common.views import APIView
 from apps.users.models import User
@@ -23,6 +25,7 @@ from ..extensions import db
 from . import (
     models,
     schemas,
+    upload_sets,
 )
 from .gcv_api import VisionClient
 
@@ -79,6 +82,14 @@ class DetectionObjectCreateListView(APIView):
 
     def post(self):
         detection_object = schemas.DetectionObjectSchema().load(request.json)
+        base64_encoded_image = request.json['image']
+        image_data = base64.b64decode(base64_encoded_image)
+        file_ = FileStorage(
+            io.BytesIO(image_data),
+            filename=f'{uuid.uuid4().hex}.jpg',
+        )
+        filename = upload_sets.detections.save(file_)
+        detection_object.image_filename = filename
         db.session.add(detection_object)
         db.session.commit()
         return Response(
