@@ -6,6 +6,8 @@ import qrcode
 
 from flask_jwt_extended import create_access_token
 
+from apps.detections import enums
+
 from . import models
 
 QR_CODE_SETTINGS = {
@@ -33,3 +35,18 @@ def qr_code_with_access_token_for(
     qr_code_image.save(image_stream, format=QR_CODE_SETTINGS['format'])
     base64_image = base64.b64encode(image_stream.getvalue())
     return base64_image.decode('utf-8') if stringify else base64_image
+
+
+def _get_amount_from(transaction):
+    amount = abs(transaction.amount)
+    if transaction.type == enums.TransactionType.INCOME:
+        return amount
+    elif transaction.type == enums.TransactionType.EXPENSE:
+        return -amount
+    return 0
+
+
+def get_account_balance(user: models.User) -> float:
+    return sum(
+        _get_amount_from(transaction) for transaction in user.transactions
+    )
