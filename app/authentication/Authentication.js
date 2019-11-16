@@ -3,6 +3,9 @@ const baseUrl = "http://vps.skarzi.com"
 const baseUsersUrl = "users";
 const baseTokenUrl = "users/auth/tokens";
 const baseQuestion = "questions/random";
+const baseImageSubmit = "detect-objects";
+const baseImageAdd = "detection-objects";
+
 let cachedToken = "";
 // Create a user through the API
 export const createUser = async (username, password) => {
@@ -78,6 +81,64 @@ export const getQuestion = async (token) => {
   }
   
   throw new Error(`HTTP Request getToken failed with status code ${response.status}`);
+}
+
+export const submitImage = async (token, imageDataBase64, width, height) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the submitImage function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/${baseImageSubmit}`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+    body: JSON.stringify({ image: imageDataBase64 })
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json();  
+    let objects = [];
+    for (let object of responseJson) {
+      objects.push({
+        object: object.obj_name,
+        x1: object.bb_vertices[0].x * width, 
+        y1: object.bb_vertices[0].y * height,
+        x2: object.bb_vertices[2].x * width,
+        y2: object.bb_vertices[2].y * height,
+      })
+    }
+    return objects;
+  }
+  
+  throw new Error(`HTTP Request submitImage failed with status code ${response.status}`);  
+}
+
+export const addImage = async (token, imageDataBase64, price, label) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the addImage function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/${baseImageAdd}`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+    body: JSON.stringify({ image: imageDataBase64, price, label  })
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json();  
+    return responseJson;
+  }
+  
+  throw new Error(`HTTP Request addImage failed with status code ${response.status}`);  
 }
 
 export const getSavedImagesAndPrices = async (token) => {
