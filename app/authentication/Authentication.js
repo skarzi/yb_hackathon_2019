@@ -133,7 +133,7 @@ export const addImage = async (token, imageDataBase64, price, label) => {
     body: JSON.stringify({ image: imageDataBase64, price, label  })
   });
 
-  if (response.status == 200) {
+  if (response.status == 201) {
     let responseJson = await response.json();  
     return responseJson;
   }
