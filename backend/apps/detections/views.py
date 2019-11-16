@@ -126,3 +126,16 @@ class DetectionObjectCreateListView(APIView):
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
+
+
+class DetectionObjectDeleteView(APIView):
+    method_decorators = [jwt_required]
+
+    def delete(self, detection_object_id):
+        detection_object = models.DetectionObject.query.get(
+            detection_object_id,
+        )
+        if detection_object:
+            db.session.delete(detection_object)
+            db.session.commit()
+        return Response(status=HTTPStatus.OK)

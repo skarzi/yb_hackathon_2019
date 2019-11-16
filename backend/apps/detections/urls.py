@@ -18,3 +18,8 @@ detections_app.add_url_rule(
     'detection-objects-list',
     views.DetectionObjectCreateListView.as_view('detection-objects-list'),
 )
+detections_app.add_url_rule(
+    '/detection-objects/<detection_object_id>',
+    'detection-objects-detail',
+    views.DetectionObjectDeleteView.as_view('detection-objects-detail'),
+)
