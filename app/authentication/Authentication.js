@@ -5,6 +5,8 @@ const baseTokenUrl = "users/auth/tokens";
 const baseQuestion = "questions/random";
 const baseImageSubmit = "detect-objects";
 const baseImageAdd = "detection-objects";
+const baseListImages = "detection-objects";
+const baseImageDelete = "detection-objects";
 
 let cachedToken = "";
 // Create a user through the API
@@ -147,11 +149,38 @@ export const getSavedImagesAndPrices = async (token) => {
   }
   const localToken = token || cachedToken;
 
-  let response = await fetch(`${baseUrl}`, {
+  let response = await fetch(`${baseUrl}/${baseListImages}`, {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: `Bearer ${localToken}`,
     },
   });
+  if (response.status == 200) {
+    let responseJson = await response.json();  
+    return responseJson;
+  }
+  throw new Error(`HTTP Request getSavedImagesAndPrices failed with status code ${response.status}`);  
+}
+
+export const deleteImage = async (token, imageId) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the addImage function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/${baseImageDelete}/${imageId}`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    }
+  });
+
+  if (response.status == 200) {
+    return true;
+  }
+  
+  throw new Error(`HTTP Request deleteImage failed with status code ${response.status}`);  
 }

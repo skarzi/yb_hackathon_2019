@@ -7,6 +7,8 @@ import HomeScreen from '../screens/HomeScreen';
 import AddScreen from '../screens/AddScreen';
 import StatsScreen from '../screens/StatsScreen';
 import GameScreen from '../screens/GameScreen';
+import ObjectsScreen from '../screens/ObjectsScreen';
+import ChildScreen from '../screens/ChildScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -35,6 +37,38 @@ HomeStack.navigationOptions = {
 };
 
 HomeStack.path = '';
+
+const ChildStack = createStackNavigator(
+  {
+    screen: ChildScreen,
+  },
+  config
+);
+
+ChildStack.navigationOptions = {
+  tabBarLabel: 'Child',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+  ),
+};
+
+ChildStack.path = '';
+
+const ObjectsStack = createStackNavigator(
+  {
+    screen: ObjectsScreen,
+  },
+  config
+);
+
+ObjectsStack.navigationOptions = {
+  tabBarLabel: 'Add',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+  ),
+};
+
+ObjectsStack.path = '';
 
 const AddStack = createStackNavigator(
   {
@@ -84,10 +118,11 @@ GameStack.navigationOptions = {
 
 GameStack.path = '';
 
-
 const tabNavigator = createBottomTabNavigator({
   HomeStack,
+  ChildStack,
   AddStack,
+  ObjectsStack,
   StatsStack,
   GameStack,
 });
