@@ -17,39 +17,19 @@ export default class AddScreen extends React.Component {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
     this.token = await getToken("frederik", "pw123456");
-    await this.updateImagesAndPrices();
-  }
-
-  updateImagesAndPrices = async() => {
-    const imagesAndPrices = [ // await getSavedImagesAndPrices();
-      { key: 0, image: 'http://thumbs.dreamstime.com/z/close-up-angry-chihuahua-growling-2-years-old-15126199.jpg', price: 10, name: 'Dog' },
-      { key: 1, image: 'http://thumbs.dreamstime.com/z/close-up-angry-chihuahua-growling-2-years-old-15126199.jpg', price: 20, name: 'Dog' },
-    ];
-    this.setState({ imagesAndPrices });
-  }
-
-  renderImageAndPrice = ({ item, index }) => {
-    return (
-      <View style={styles.containerImage}>
-        <ImageNative style={{width: "50%", height: 120}} source={{uri: item.image}}/>
-        <Text>
-          {item.name}: {item.price}$
-        </Text>
-      </View>
-    )
   }
 
   takePhoto = async() => {
     if (this.camera) {
-      console.log("take");
       this.last_photo = await this.camera.takePictureAsync();
 
       let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}}], {base64: true});
+      await this.setState({image: image.uri, price: 0.1, imageRects: [], selectedObject: -1});
+      this.forceUpdate();
 
       let imageData = image.base64;
       let imageRects = await submitImage(this.token, imageData, layout.window.width, 400);
       
-      await this.setState({image: image.uri, price: 0.1, imageRects: [], selectedObject: -1});
       await this.setState({imageRects, selectedObject: -1});
     }
   }
@@ -108,13 +88,6 @@ export default class AddScreen extends React.Component {
           <TouchableOpacity style={styles.button} onPress={this.takePhoto}>
             <Text style={styles.buttonText}>Take photo</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Objects Added</Text>
-          <FlatList
-            numColumns={2}
-            contentContainerStyle={styles.list}
-            data={this.state.imagesAndPrices}
-            renderItem={this.renderImageAndPrice}
-          />
         </ScrollView>
       );
     }
@@ -163,13 +136,6 @@ export default class AddScreen extends React.Component {
             <Text style={styles.buttonText}>Take another photo</Text>
         </TouchableOpacity>
         {objectSelection}
-        <Text style={styles.header}>Objects Added</Text>
-        <FlatList
-          numColumns={2}
-          contentContainerStyle={styles.list}
-          data={this.state.imagesAndPrices}
-          renderItem={this.renderImageAndPrice}
-        />
       </ScrollView>      
     );
   }

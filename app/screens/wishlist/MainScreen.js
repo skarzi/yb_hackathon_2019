@@ -38,7 +38,7 @@ export default class MainWishListScreen extends React.Component {
         return <Card
             containerStyle={styles.wish}
             title={`${item.content} WORLD `}
-            image={require('../../images/pic2.jpg')}
+            image={require('../../assets/images/logo.png')}
             imageStyle={styles.wishImage}
         >
             <Text style={{ marginBottom: 1 }}>

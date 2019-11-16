@@ -4,8 +4,6 @@ import typing
 
 import qrcode
 
-from flask_jwt_extended import create_access_token
-
 from apps.detections import enums
 
 from . import models
@@ -23,12 +21,9 @@ QR_CODE_SETTINGS = {
     'format': 'PNG',
 }
 
-def qr_code_with_access_token_for(
-        user: models.User,
-        stringify: bool = False,
-) -> typing.AnyStr:
+def qr_code_with(data: str, stringify: bool = False) -> typing.AnyStr:
     qr_code = qrcode.QRCode(**QR_CODE_SETTINGS['general'])
-    qr_code.add_data(create_access_token(identity=user))
+    qr_code.add_data(data)
     qr_code.make(fit=True)
     qr_code_image = qr_code.make_image(**QR_CODE_SETTINGS['colors'])
     image_stream = io.BytesIO()

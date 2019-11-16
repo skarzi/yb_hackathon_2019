@@ -6,7 +6,6 @@ import flask
 
 from . import extensions
 from .common.blueprints import register_blueprint
-from .task_app.celery import celery_app
 
 
 def create_app(config_module_path: str = ''):
@@ -27,10 +26,7 @@ def create_app(config_module_path: str = ''):
         flask_app.config['MIGRATIONS_DIRECTORY'],
     )
     extensions.schemas.init_app(flask_app)
-    extensions.celery_extension.init_app(flask_app, celery_app)
     extensions.jwt.init_app(flask_app)
-    # TODO: uncomment to run socket.io
-    # extensions.socketio.init_app(flask_app)
     extensions.admin.init_app(flask_app)
     extensions.cors.init_app(flask_app)
 
@@ -38,10 +34,5 @@ def create_app(config_module_path: str = ''):
         import_module('apps.common.exceptions')
         for middleware_module in flask_app.config.get('MIDDLEWARES', []):
             import_module(middleware_module)
-
-    # TODO: extract it to some method etc
-    from apps import commands
-
-    flask_app.cli.add_command(commands.run_socketio)
 
     return flask_app

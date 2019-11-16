@@ -14,40 +14,48 @@ import {
 
 import { MonoText } from '../components/StyledText';
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-                require('../assets/images/logo.png')
-            }
-            style={styles.welcomeImage}
-          />
-        </View>
+export default class HomeScreen extends React.Component {
+  render() {
+    return (
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}>
+          <View style={styles.welcomeContainer}>
+            <Image
+              source={
+                  require('../assets/images/logo.png')
+              }
+              style={styles.welcomeImage}
+            />
+          </View>
 
-        <View style={styles.getStartedContainer}>
-          <Text style={styles.getStartedText}>Piggee Bank</Text>
-        </View>
+          <View style={styles.getStartedContainer}>
+            <Text style={styles.getStartedText}>Piggee Bank</Text>
+          </View>
 
-        <View style={styles.helpContainer}>
-          <Text style={styles.helpLinkText}>
-            Welcome to this demo app of the Piggee Bank concept. The Piggee Bank is a digital wallet for your kid(s) to learn to spend money responsible. To get started:
-          </Text>
-          <FlatList
-            data={[{key: '1. add some objects and their prices'}, {key: '2. assign some credit to your kid(s)'}]}
-            renderItem={({item}) => <Text style={styles.helpLinkText}>{item.key}</Text>}
-          />
-          <Text style={styles.helpLinkText}>
-            Then, enjoy playing with them to teach them responsible spending!
-          </Text>
-        </View>
-      </ScrollView>
-    </View>
-  );
+          <View style={styles.helpContainer}>
+            <Text style={styles.helpLinkText}>
+              Welcome to this demo app of the Piggee Bank concept. The Piggee Bank is a digital wallet for your kid(s) to learn to spend money responsible. To get started:
+            </Text>
+            <FlatList
+              data={[{key: '1. add some objects and their prices'}, {key: '2. assign some credit to your kid(s)'}]}
+              renderItem={({item}) => <Text style={styles.helpLinkText}>{item.key}</Text>}
+            />
+            <Text style={styles.helpLinkText}>
+              Then, enjoy playing with them to teach them responsible spending!
+            </Text>
+            <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.navigate('Child');}}>
+              <Text style={styles.buttonText}>Child mode</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.navigate('Parent');}}>
+              <Text style={styles.buttonText}>Parent mode</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
 }
 
 HomeScreen.navigationOptions = {
@@ -59,13 +67,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#DDDDDD',
+    padding: 10,
+    margin: 2
   },
+  buttonText: {
+    fontSize: 20
+  },  
   contentContainer: {
     paddingTop: 30,
   },

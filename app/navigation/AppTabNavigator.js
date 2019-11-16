@@ -8,6 +8,8 @@ import HomeScreen from '../screens/HomeScreen';
 import AddScreen from '../screens/AddScreen';
 import StatsScreen from '../screens/StatsScreen';
 import GameScreen from '../screens/GameScreen';
+import ObjectsScreen from '../screens/ObjectsScreen';
+import ChildScreen from '../screens/ChildScreen';
 import MainWishListScreen from '../screens/wishlist/MainScreen';
 
 const config = Platform.select({
@@ -37,6 +39,38 @@ HomeStack.navigationOptions = {
 };
 
 HomeStack.path = '';
+
+const ChildStack = createStackNavigator(
+  {
+    screen: ChildScreen,
+  },
+  config
+);
+
+ChildStack.navigationOptions = {
+  tabBarLabel: 'Child',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+  ),
+};
+
+ChildStack.path = '';
+
+const ObjectsStack = createStackNavigator(
+  {
+    screen: ObjectsScreen,
+  },
+  config
+);
+
+ObjectsStack.navigationOptions = {
+  tabBarLabel: 'Add',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+  ),
+};
+
+ObjectsStack.path = '';
 
 const AddStack = createStackNavigator(
   {
@@ -86,7 +120,6 @@ GameStack.navigationOptions = {
 
 GameStack.path = '';
 
-
 const WishListStack = createStackNavigator(
   {
     Stats: MainWishListScreen,
@@ -101,14 +134,22 @@ WishListStack.navigationOptions = {
   ),
 };
 
-const tabNavigator = createBottomTabNavigator({
+const ParentTabNavigator = createBottomTabNavigator({
   HomeStack,
+  ChildStack,
   AddStack,
+  ObjectsStack,
   StatsStack,
+});
+
+ParentTabNavigator.path = '';
+
+const ChildTabNavigator = createBottomTabNavigator({
+  HomeStack,
   GameStack,
   WishListStack,
 });
 
-tabNavigator.path = '';
+ChildTabNavigator.path = '';
 
-export default tabNavigator;
+export default {ParentTabNavigator, ChildTabNavigator};
