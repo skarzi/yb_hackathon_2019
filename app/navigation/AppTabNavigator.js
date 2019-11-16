@@ -64,7 +64,7 @@ const ObjectsStack = createStackNavigator(
 );
 
 ObjectsStack.navigationOptions = {
-  tabBarLabel: 'Obhects',
+  tabBarLabel: 'Objects',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-cube' : 'md-cube'} />
   ),
