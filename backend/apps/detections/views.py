@@ -59,10 +59,8 @@ class TransactionCreateListView(APIView):
             user = current_user
         else:
             user = User.query.get(user_id)
-        # TODO: fill with logic
-        # user.transactions: typing.List[Transaction]
         return Response(
-            schemas.TransactionSchema(many=True).dumps(transactions),
+            schemas.TransactionSchema(many=True).dumps(user.transactions),
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
