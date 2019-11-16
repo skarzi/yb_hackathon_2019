@@ -1,4 +1,5 @@
 // Base url of the API
+//const baseUrl = "http://vps.skarzi.com"
 const baseUrl = "http://92778af4.ngrok.io"
 const baseUsersUrl = "users";
 const baseTokenUrl = "users/auth/tokens";
@@ -151,6 +152,7 @@ export const submitImage = async (token, imageDataBase64, width, height) => {
   });
 
   if (response.status == 200) {
+    console.log(response.json());
     let responseJson = await response.json();  
     let objects = [];
     for (let object of responseJson) {
