@@ -30,7 +30,7 @@ COCO_INSTANCE_CATEGORY_NAMES = [
 transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
 
 
-def get_prediction(img_pil, threshold):
+def get_prediction(img_pil, threshold, limit_n_detects=10):
     """Run the object detection model on an PIL Image img_pil.
     Supply maximum suppression by a given threshold. All detections with scores below that threshold are not considered.
     """
@@ -43,13 +43,20 @@ def get_prediction(img_pil, threshold):
 
     pred_class = [COCO_INSTANCE_CATEGORY_NAMES[i] for i in
                   list(pred[0]['labels'].cpu().numpy())]  # Get the Prediction Score
-    if len(pred_class) == 0:
-        return [], [], []
 
     pred_boxes = [[(i[0], i[1]), (i[2], i[3])] for i in list(pred[0]['boxes'].cpu().detach().numpy())]  # Bounding boxes
     pred_score = list(pred[0]['scores'].cpu().detach().numpy())
 
-    pred_t = [pred_score.index(x) for x in pred_score if x > threshold][-1]
+    # Limit number of detections
+    pred_class = pred_class[:limit_n_detects]
+    pred_boxes = pred_boxes[:limit_n_detects]
+    pred_score = pred_score[:limit_n_detects]
+    pred_ts = [pred_score.index(x) for x in pred_score if x > threshold]
+
+    # Handle case when there are no detections above threshold
+    if len(pred_ts) == 0:
+        return [], [], []
+    pred_t = pred_ts[-1]
     pred_boxes = pred_boxes[:pred_t + 1]
     pred_class = pred_class[:pred_t + 1]
     pred_scores = pred_score[:pred_t + 1]
