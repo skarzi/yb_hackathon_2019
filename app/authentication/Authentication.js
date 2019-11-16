@@ -1,5 +1,5 @@
 // Base url of the API
-const baseUrl = "http://vps.skarzi.com"
+const baseUrl = "http://92778af4.ngrok.io"
 const baseUsersUrl = "users";
 const baseTokenUrl = "users/auth/tokens";
 const baseQuestion = "questions/random";
