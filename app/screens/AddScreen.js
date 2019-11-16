@@ -1,9 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity, Text, Slider } from 'react-native';
+import { FlatList, Image as ImageNative, ScrollView, StyleSheet, View, TouchableOpacity, Text, Slider } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
+import { addImage, getSavedImagesAndPrices, getToken, submitImage } from "../authentication/Authentication.js";
 import * as ImageManipulator from 'expo-image-manipulator';
 import Svg, {Image, Rect} from 'react-native-svg';
+import layout from "../constants/Layout.js";
 
 export default class AddScreen extends React.Component {
   state = {
@@ -14,44 +16,61 @@ export default class AddScreen extends React.Component {
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
+    this.token = await getToken("frederik", "pw123456");
+    await this.updateImagesAndPrices();
+  }
+
+  updateImagesAndPrices = async() => {
+    const imagesAndPrices = [ // await getSavedImagesAndPrices();
+      { key: 0, image: 'http://thumbs.dreamstime.com/z/close-up-angry-chihuahua-growling-2-years-old-15126199.jpg', price: 10, name: 'Dog' },
+      { key: 1, image: 'http://thumbs.dreamstime.com/z/close-up-angry-chihuahua-growling-2-years-old-15126199.jpg', price: 20, name: 'Dog' },
+    ];
+    this.setState({ imagesAndPrices });
+  }
+
+  renderImageAndPrice = ({ item, index }) => {
+    return (
+      <View style={styles.containerImage}>
+        <ImageNative style={{width: "50%", height: 120}} source={{uri: item.image}}/>
+        <Text>
+          {item.name}: {item.price}$
+        </Text>
+      </View>
+    )
   }
 
   takePhoto = async() => {
     if (this.camera) {
       console.log("take");
-      let photo = await this.camera.takePictureAsync();
-      let image = await ImageManipulator.manipulateAsync(photo.uri, [{resize: {width: 640}}], {base64: true});
+      this.last_photo = await this.camera.takePictureAsync();
+
+      let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}}], {base64: true});
+
       let imageData = image.base64;
-      // send imageData to api
+      let imageRects = await submitImage(this.token, imageData, layout.window.width, 400);
+      
       await this.setState({image: image.uri, price: 0.1, imageRects: [], selectedObject: -1});
-      await this.setState({imageRects: [
-        {
-          x1: 2,
-          y1: 3,
-          x2: 10,
-          y2: 15,
-          object: "Nothing special"
-        }, 
-        {
-          x1: 21,
-          y1: 32,
-          x2: 50,
-          y2: 45,
-          object: "Bottle of whisky"
-        },
-        {
-          x1: 61,
-          y1: 57,
-          x2: 90,
-          y2: 99,
-          object: "Banana"
-        } 
-      ], selectedObject: -1});
+      await this.setState({imageRects, selectedObject: -1});
     }
   }
 
   takeNewPhoto = () => {
     this.setState({image: null, price: 0.1});
+  }
+
+  addPhoto = async () => {
+    let selectedCrop = this.state.imageRects[this.state.selectedObject];
+    let x1 = selectedCrop.x1 / layout.window.width * 640;
+    let x2 = selectedCrop.x2 / layout.window.width * 640;
+    let y1 = selectedCrop.y1 / 400 * 480;
+    let y2 = selectedCrop.y2 / 400 * 480;
+    let cropWidth = x2 - x1;
+    let cropHeight = y2 - y1;
+    let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}},  {crop: { originX: x1, originY: y1, width: cropWidth, height: cropHeight}}], {base64: true});
+    let imageData = image.base64;
+
+    await addImage(this.token, imageData, this.state.price, selectedCrop.object);
+    this.takeNewPhoto();
   }
 
   sliderValueChange = (val) => {
@@ -89,6 +108,13 @@ export default class AddScreen extends React.Component {
           <TouchableOpacity style={styles.button} onPress={this.takePhoto}>
             <Text style={styles.buttonText}>Take photo</Text>
           </TouchableOpacity>
+          <Text style={styles.header}>Objects Added</Text>
+          <FlatList
+            numColumns={2}
+            contentContainerStyle={styles.list}
+            data={this.state.imagesAndPrices}
+            renderItem={this.renderImageAndPrice}
+          />
         </ScrollView>
       );
     }
@@ -96,8 +122,8 @@ export default class AddScreen extends React.Component {
     let rects = [];
     for(let i = 0; i < this.state.imageRects.length; ++i) {
       let rect = this.state.imageRects[i];
-      rects.push(<Rect key={"Rect" + i} x={"" + (rect.x1) + "%"} y={"" + (rect.y1) + "%"}
-        width={"" + (rect.x2-rect.x1) + "%"} height={"" + (rect.y2-rect.y1) + "%"} fill="none" strokeWidth="3" 
+      rects.push(<Rect key={"Rect" + i} x={(rect.x1)} y={(rect.y1)}
+        width={(rect.x2-rect.x1)} height={(rect.y2-rect.y1)} fill="none" strokeWidth="3" 
         stroke={this.state.selectedObject == i ? "green" : "red"} onPress={() => { this.selectObject(i, rect.object); }} />);
     }
 
@@ -117,7 +143,7 @@ export default class AddScreen extends React.Component {
               onValueChange={this.sliderValueChange}
             />
           </View>
-          <TouchableOpacity style={styles.button} onPress={this.takeNewPhoto}>
+          <TouchableOpacity style={styles.button} onPress={this.addPhoto}>
               <Text style={styles.buttonText}>Add</Text>
           </TouchableOpacity>
         </View>;
@@ -137,6 +163,13 @@ export default class AddScreen extends React.Component {
             <Text style={styles.buttonText}>Take another photo</Text>
         </TouchableOpacity>
         {objectSelection}
+        <Text style={styles.header}>Objects Added</Text>
+        <FlatList
+          numColumns={2}
+          contentContainerStyle={styles.list}
+          data={this.state.imagesAndPrices}
+          renderItem={this.renderImageAndPrice}
+        />
       </ScrollView>      
     );
   }
@@ -149,7 +182,6 @@ AddScreen.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 15,
     backgroundColor: '#fff',
   },
   optionView: {
@@ -168,5 +200,29 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20
-  }
+  },
+  list: {
+    justifyContent: 'center',
+  },
+  containerImage: {
+    flex: 1,
+    paddingTop: 0,
+    backgroundColor: '#fff',
+    alignSelf: 'center',
+    paddingTop:10,
+  },
+  header: {
+    paddingTop:15,
+    textAlign:'center',
+    fontWeight:'bold',
+    fontSize:18,
+  },
+  imageItem: {
+    margin: "1%",
+    width: "48%",
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderColor: '#CCC',
+    borderWidth: 1,
+  },
 });

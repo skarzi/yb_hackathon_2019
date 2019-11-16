@@ -8,18 +8,18 @@ from . import models
 
 class DetectionObjectSchema(schemas.ModelSchema):
     created_at = field_for(models.DetectionObject, 'created_at', dump_only=True)
+    image_url = fields.Url(dump_only=True)
+    image = fields.Str(load_only=True)
 
     class Meta:
         model = models.DetectionObject
         fields = (
             'id',
-            'x_pos',
-            'y_pos',
-            'width',
-            'height',
             'label',
-            'score',
+            'price',
             'created_at',
+            'image_url',
+            'image',
         )
 
 
