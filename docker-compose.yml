@@ -4,9 +4,11 @@ services:
   db:
     image: postgres:latest
     volumes:
-      - yb_hackathon-postgresql:/var/lib/postgresql/data
+      - /home/matt/code/yb_hackathon_2019/backend/shared/postgresql/data:/var/lib/postgresql/data
     env_file:
       - .envs/postgresql
+    ports:
+      - "5500:5432"
     environment:
       # set `${PGDATA}` to a subdirectory because PostgreSQL needs this
       # directory to be empty and there is already `.gitkeep` file there

@@ -62,10 +62,10 @@ def convert_into_dict(boxes, pred_cls, pred_scores, img_shape):
     detections = []
     for box, class_, score in zip(boxes, pred_cls, pred_scores):
         top_left, bottom_right = box
-        x1 = top_left[0] / width
-        y1 = top_left[1] / height
-        x3 = bottom_right[0] / width
-        y3 = bottom_right[1] / height
+        x1 = float(top_left[0] / width)
+        y1 = float(top_left[1] / height)
+        x3 = float(bottom_right[0] / width)
+        y3 = float(bottom_right[1] / height)
         x2 = x3
         y2 = y1
         x4 = x1
@@ -78,7 +78,7 @@ def convert_into_dict(boxes, pred_cls, pred_scores, img_shape):
                 {'x': x3, 'y': y3},
                 {'x': x4, 'y': y4},
             ],
-            'confidence': score,
+            'confidence': float(score),
             'obj_name': class_
         }
         detections.append(entry)

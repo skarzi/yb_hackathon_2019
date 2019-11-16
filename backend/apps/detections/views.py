@@ -67,7 +67,6 @@ class TransactionCreateListView(APIView):
         )
 
 
-
 class ObjectDetectionView(APIView):
     def post(self):
         base64_encoded_image = request.json['image']
