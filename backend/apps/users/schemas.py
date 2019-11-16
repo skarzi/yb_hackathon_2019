@@ -8,7 +8,10 @@ from marshmallow_sqlalchemy import field_for
 from marshmallow_sqlalchemy.fields import Nested
 
 from ..extensions import schemas
-from . import models
+from . import (
+    models,
+    utils,
+)
 
 
 class UserSchema(schemas.ModelSchema):
@@ -42,9 +45,13 @@ class UserSchema(schemas.ModelSchema):
 
 class ChildSchema(UserSchema):
     parents = Nested(UserSchema, many=True)
+    balance = fields.Method('get_balance')
 
     class Meta(UserSchema.Meta):
-        fields = (*UserSchema.Meta.fields, 'parents')
+        fields = (*UserSchema.Meta.fields, 'parents', 'balance')
+
+    def get_balance(self, obj):
+        return utils.get_account_balance(obj)
 
 
 class ParentSchema(UserSchema):

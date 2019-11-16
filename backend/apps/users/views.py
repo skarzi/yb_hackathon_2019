@@ -10,6 +10,7 @@ from flask import (
 )
 
 from flask_jwt_extended import (
+    create_access_token,
     current_user,
     jwt_required,
 )
@@ -77,8 +78,10 @@ class UserCreateListChildrenView(APIView):
         db.session.add(child)
         db.session.commit()
         response_data = schemas.UserSchema(exclude=('password',)).dump(child)
-        response_data['access_token_qr_code'] = utils.qr_code_with_access_token_for(
-            child,
+        access_token = create_access_token(identity=child)
+        response_data['access_token'] = access_token
+        response_data['access_token_qr_code'] = utils.qr_code_with(
+            access_token,
             stringify=True,
         )
         return Response(

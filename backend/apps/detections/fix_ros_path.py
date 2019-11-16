@@ -11,4 +11,4 @@ def fix_ros_cv_path() -> None:
         sys.path.remove(ros_path)
 
 
-fix_ros_cv_path()
+# fix_ros_cv_path()
