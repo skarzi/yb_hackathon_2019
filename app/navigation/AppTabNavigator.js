@@ -6,6 +6,7 @@ import { DrawerItems } from 'react-navigation-drawer';
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import AddScreen from '../screens/AddScreen';
+import GuessScreen from '../screens/GuessScreen';
 import StatsScreen from '../screens/StatsScreen';
 import GameScreen from '../screens/GameScreen';
 import ObjectsScreen from '../screens/ObjectsScreen';
@@ -64,7 +65,7 @@ const ObjectsStack = createStackNavigator(
 );
 
 ObjectsStack.navigationOptions = {
-  tabBarLabel: 'Add',
+  tabBarLabel: 'Objects',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-camera' : 'md-camera'} />
   ),
@@ -80,13 +81,29 @@ const AddStack = createStackNavigator(
 );
 
 AddStack.navigationOptions = {
-  tabBarLabel: 'Objects',
+  tabBarLabel: 'Add',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-cube' : 'md-cube'} />
   ),
 };
 
 AddStack.path = '';
+
+const GuessStack = createStackNavigator(
+  {
+    screen: GuessScreen,
+  },
+  config
+);
+
+GuessStack.navigationOptions = {
+  tabBarLabel: 'Guess',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-cube' : 'md-cube'} />
+  ),
+};
+
+GuessStack.path = '';
 
 const StatsStack = createStackNavigator(
   {
@@ -145,6 +162,7 @@ ParentTabNavigator.path = '';
 
 const ChildTabNavigator = createBottomTabNavigator({
   HomeStack,
+  GuessStack,
   GameStack,
   WishListStack,
 });

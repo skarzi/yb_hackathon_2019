@@ -152,7 +152,6 @@ export const submitImage = async (token, imageDataBase64, width, height) => {
   });
 
   if (response.status == 200) {
-    console.log(response.json());
     let responseJson = await response.json();  
     let objects = [];
     for (let object of responseJson) {
