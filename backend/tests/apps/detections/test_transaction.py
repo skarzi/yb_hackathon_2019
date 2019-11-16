@@ -47,6 +47,8 @@ class TestTransactionHistory(unittest.TestCase):
         self.assertEqual(self.total_rejections, self.history.get_total_amount_in_range(date_range, TransactionType.REJECTION))
         self.assertEqual(self.total_expenses, self.history.get_total_amount_in_range(date_range, TransactionType.EXPENSE))
 
+    def print_hist(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()

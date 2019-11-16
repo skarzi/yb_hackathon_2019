@@ -2,6 +2,7 @@ from pprint import pprint
 import numpy as np
 import torch
 import torchvision
+from pprint import pprint
 
 import cv2
 import matplotlib.pyplot as plt
@@ -30,6 +31,9 @@ transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
 
 
 def get_prediction(img_pil, threshold):
+    """Run the object detection model on an PIL Image img_pil.
+    Supply maximum suppression by a given threshold. All detections with scores below that threshold are not considered.
+    """
     img = transform(img_pil)
 
     if torch.cuda.is_available():
@@ -39,17 +43,21 @@ def get_prediction(img_pil, threshold):
 
     pred_class = [COCO_INSTANCE_CATEGORY_NAMES[i] for i in
                   list(pred[0]['labels'].cpu().numpy())]  # Get the Prediction Score
+    if len(pred_class) == 0:
+        return [], [], []
+
     pred_boxes = [[(i[0], i[1]), (i[2], i[3])] for i in list(pred[0]['boxes'].cpu().detach().numpy())]  # Bounding boxes
     pred_score = list(pred[0]['scores'].cpu().detach().numpy())
-    pred_t = [pred_score.index(x) for x in pred_score if x > threshold][
-        -1]  # Get list of index with score greater than threshold.
+
+    pred_t = [pred_score.index(x) for x in pred_score if x > threshold][-1]
     pred_boxes = pred_boxes[:pred_t + 1]
     pred_class = pred_class[:pred_t + 1]
     pred_scores = pred_score[:pred_t + 1]
+    torch.cuda.empty_cache()
     return pred_boxes, pred_class, pred_scores
 
 
-def detect_objects(img, threshold=0.5):
+def detect_objects(img, threshold=0.55):
     """Run the actual inference on the network."""
     boxes, pred_cls, pred_score = get_prediction(img, threshold)
     return convert_into_dict(boxes, pred_cls, pred_score, img.size)
@@ -72,7 +80,7 @@ def convert_into_dict(boxes, pred_cls, pred_scores, img_shape):
         y4 = y3
 
         entry = {
-            'bb_boxes': [
+            'bb_vertices': [
                 {'x': x1, 'y': y1},
                 {'x': x2, 'y': y2},
                 {'x': x3, 'y': y3},
@@ -82,6 +90,7 @@ def convert_into_dict(boxes, pred_cls, pred_scores, img_shape):
             'obj_name': class_
         }
         detections.append(entry)
+    pprint(detections)
     return detections
 
 

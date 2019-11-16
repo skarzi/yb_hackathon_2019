@@ -1,5 +1,12 @@
+import io
+import os
+from pprint import pprint
+
 from google.cloud import vision
 from google.cloud.vision import types
+
+from backend.apps.detections import cv_helpers
+import cv2
 
 from typing import List, Dict
 
@@ -68,3 +75,53 @@ def objects_dict_coords_to_pic(object_detections, img_shape):
         raise ValueError('Only works if objects detected has been converted dict.')
     for detection in object_detections:
         detection['bb_vertices'] = bb_norm_to_corner_pixels(detection['bb_vertices'], img_shape)
+
+
+def read_img_bin(path):
+    with io.open(path, 'rb') as image_file:
+        return image_file.read()
+
+
+def read_img_cv(path):
+    return cv2.imread(path)
+
+
+def show_detections(img_cv, objects):
+    font                   = cv2.FONT_HERSHEY_DUPLEX
+    fontScale              = 2
+    fontColor              = (255, 255, 255)
+    lineType               = 2
+
+    for pred in objects:
+        bbox_pix = pred['bb_vertices']
+        top_left_x, top_left_y = bbox_pix[0]['x'], bbox_pix[0]['y']
+        bottom_right_x, bottom_right_y = bbox_pix[2]['x'], bbox_pix[2]['y']
+        img_cv = cv2.rectangle(img_cv, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), (0,0,255), 2)
+
+        img_cv = cv2.putText(img_cv,f'{pred["obj_name"]}, acc: {round(pred["confidence"], 2)}',
+            (top_left_x, top_left_y-5),
+            font,
+            fontScale,
+            fontColor,
+            lineType)
+    cv2.imshow('img', cv_helpers.image_resize(img_cv, height=800))
+
+
+def demo_gcp_demo():
+    DIR = '/home/matt/polybox/Fotos/Yb/'
+    FILES = ['less.jpg']
+
+    files = FILES if len(FILES) != 0 else os.listdir(DIR)
+    paths = [os.path.join(DIR, f) for f in files]
+
+    for path in paths:
+        print(path)
+        img_cv = read_img_cv(path)
+        img_bin = read_img_bin(path)
+        vision_client = VisionClient()
+        objects = vision_client.localize_objects(img_bin)
+        # objects_dict_coords_to_pic(objects, img_cv.shape)
+        pprint(objects)
+        show_detections(img_cv, objects)
+        cv2.waitKey(0)
+    cv2.destroyAllWindows()
