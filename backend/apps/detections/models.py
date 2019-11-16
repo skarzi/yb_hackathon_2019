@@ -40,7 +40,7 @@ class DetectionObject(Timestampable, UUIDable):
     @property
     def image_path(self):
         if self.image_filename is None:
-            return
+            return ''
         return upload_sets.detections.path(self.image_filename)
 
 
