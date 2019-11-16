@@ -22,7 +22,10 @@ export default class AddScreen extends React.Component {
   takePhoto = async() => {
     if (this.camera) {
       this.last_photo = await this.camera.takePictureAsync();
-
+      if(!this.last_photo) {
+        throw Error("Can't take photo");
+        return;
+      }
       let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}}], {base64: true});
       await this.setState({image: image.uri, price: 0.1, imageRects: [], selectedObject: -1});
       this.forceUpdate();
@@ -30,6 +33,14 @@ export default class AddScreen extends React.Component {
       let imageData = image.base64;
       let imageRects = await submitImage(this.token, imageData, layout.window.width, 400);
       
+      // fix issue with big objects overlaying small
+      imageRects.sort((a, b) => {
+        let area1 = (a.x2 - a.x1) * (a.y2 - a.y1);
+        let area2 = (b.x2 - b.x1) * (b.y2 - b.y1);
+        if(area1 == area2) return 0;
+        return area1 < area2 ? 1 : -1;
+      });
+
       await this.setState({imageRects, selectedObject: -1});
     }
   }
@@ -40,10 +51,10 @@ export default class AddScreen extends React.Component {
 
   addPhoto = async () => {
     let selectedCrop = this.state.imageRects[this.state.selectedObject];
-    let x1 = selectedCrop.x1 / layout.window.width * 640;
-    let x2 = selectedCrop.x2 / layout.window.width * 640;
-    let y1 = selectedCrop.y1 / 400 * 480;
-    let y2 = selectedCrop.y2 / 400 * 480;
+    let x1 = selectedCrop.x1 / layout.window.width * 640 - 20;
+    let x2 = selectedCrop.x2 / layout.window.width * 640 + 20;
+    let y1 = selectedCrop.y1 / 400 * 480 - 20;
+    let y2 = selectedCrop.y2 / 400 * 480 + 20;
     let cropWidth = x2 - x1;
     let cropHeight = y2 - y1;
     let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}},  {crop: { originX: x1, originY: y1, width: cropWidth, height: cropHeight}}], {base64: true});
@@ -83,8 +94,7 @@ export default class AddScreen extends React.Component {
     if(!this.state.image) {
       return (
         <ScrollView style={styles.container}>
-          <Camera style={{ flex: 1, height: 400 }} type={this.state.type}
-            pictureSize="640x480" ratio="4:3" ref={ref => { this.camera = ref; }} />
+          <Camera style={{ flex: 1, height: 400 }} type={this.state.type} ref={ref => { this.camera = ref; }} />
           <TouchableOpacity style={styles.button} onPress={this.takePhoto}>
             <Text style={styles.buttonText}>Take photo</Text>
           </TouchableOpacity>

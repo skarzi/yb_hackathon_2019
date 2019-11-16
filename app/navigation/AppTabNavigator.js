@@ -137,8 +137,7 @@ const ParentTabNavigator = createBottomTabNavigator({
   HomeStack,
   ChildStack,
   AddStack,
-  ObjectsStack,
-  StatsStack,
+  ObjectsStack
 });
 
 ParentTabNavigator.path = '';
