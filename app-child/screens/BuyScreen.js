@@ -19,6 +19,10 @@ export default class BuyScreen extends React.Component {
     this.token = await getToken("frederik", "pw123456");
     this.childId = await getFirstChild(this.token);
     this.updateBalance();
+
+    this.props.navigation.addListener('willFocus', (route) => { 
+        this.updateBalance();
+    });
   }
 
   updateBalance = async () => {
