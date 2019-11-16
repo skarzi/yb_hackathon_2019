@@ -22,8 +22,11 @@ class QuestionRandomView(APIView):
 
     def get(self):
         question = models.Question.query.order_by(func.random()).first()
+        if question:
+            response_data = schemas.QuestionSchema().dumps(question)
+        else:
+            response_data = '{}'
         return Response(
-            schemas.QuestionSchema().dumps(question),
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
