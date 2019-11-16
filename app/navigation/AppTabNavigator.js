@@ -67,7 +67,7 @@ const ObjectsStack = createStackNavigator(
 ObjectsStack.navigationOptions = {
   tabBarLabel: 'Objects',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-camera' : 'md-camera'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-cube' : 'md-cube'} />
   ),
 };
 
@@ -83,7 +83,7 @@ const AddStack = createStackNavigator(
 AddStack.navigationOptions = {
   tabBarLabel: 'Add',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-cube' : 'md-cube'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-camera' : 'md-camera'} />
   ),
 };
 

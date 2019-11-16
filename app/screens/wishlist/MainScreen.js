@@ -95,12 +95,7 @@ export default class MainWishListScreen extends React.Component {
         let curr = index == 0 ? styles.statusBarRemain : styles.statusBarSpent;
         
         let _width = `${item.val}%`;
-        console.log(_width);
-        console.log(curr)
         let updated = Object.assign({}, { width: _width }, curr);
-        console.log(updated);
-
-
         return (
             <View style={updated} />
         )
@@ -109,7 +104,6 @@ export default class MainWishListScreen extends React.Component {
     getStatusBar = () => {
         let value = parseInt(100.0 *this.state.ratio)
         let ratio = [{ key: 0, val: value }, { key: 1, val: 100 - value }];
-        console.log("status" + ratio);
         return ratio;
     }
 
