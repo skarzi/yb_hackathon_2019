@@ -8,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen';
 import AddScreen from '../screens/AddScreen';
 import GuessScreen from '../screens/GuessScreen';
 import StatsScreen from '../screens/StatsScreen';
+import BuyScreen from '../screens/BuyScreen';
 import GameScreen from '../screens/GameScreen';
 import ObjectsScreen from '../screens/ObjectsScreen';
 import ChildScreen from '../screens/ChildScreen';
@@ -137,6 +138,22 @@ GameStack.navigationOptions = {
 
 GameStack.path = '';
 
+const BuyStack = createStackNavigator(
+  {
+    screen: BuyScreen,
+  },
+  config
+);
+
+BuyStack.navigationOptions = {
+  tabBarLabel: 'Buy',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-basketball' : 'md-basketball'} />
+  ),
+};
+
+BuyStack.path = '';
+
 const WishListStack = createStackNavigator(
   {
     Stats: MainWishListScreen,
@@ -163,6 +180,7 @@ ParentTabNavigator.path = '';
 const ChildTabNavigator = createBottomTabNavigator({
   HomeStack,
   GuessStack,
+  BuyStack,
   GameStack,
   WishListStack,
 });
