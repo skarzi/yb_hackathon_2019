@@ -119,9 +119,11 @@ export default class MainWishListScreen extends React.Component {
     render() {
         return (
             <SafeAreaView styles={styles.container}>
+                <Card title={`Budget: \$${this.state.tmpBalance}`} containerStyle={styles.topcardContainer}>
+
                 <View
                     styles={styles.statusBarContainer}
-                >
+                    >
                 
                 <FlatList
                     numColumns={2}
@@ -131,10 +133,11 @@ export default class MainWishListScreen extends React.Component {
                     extraData={this.state}
                     />
                 </View>
+                    </Card>
                 
                 <ScrollView styles={styles.container}>
                     <FlatList
-                        numColumns={3}
+                        numColumns={2}
                         contentContainerStyle={styles.list}
                         data={this.state.items}
                         renderItem={this.renderItem}
@@ -150,6 +153,10 @@ MainWishListScreen.navigationOptions = {
 };
 
 const styles = StyleSheet.create({
+    topcardContainer: {
+        width: "100%",
+        margin:0
+    },
     container: {
         flex: 1,
         paddingTop: 0
