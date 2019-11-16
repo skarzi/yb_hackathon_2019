@@ -15,6 +15,7 @@ from flask_jwt_extended import (
     current_user,
     jwt_required,
 )
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import FileStorage
 
@@ -40,6 +41,10 @@ class TransactionCreateListView(APIView):
             user = User.query.get(user_id)
         data = dict(request.json)
         transaction = schemas.TransactionSchema().load(data)
+        transaction.amount = (
+            transaction.amount
+            or getattr(transaction.detection_object, 'price', 0)
+        )
         transaction.user = user
         db.session.add(transaction)
         db.session.commit()
@@ -91,7 +96,17 @@ class DetectionObjectCreateListView(APIView):
         filename = upload_sets.detections.save(file_)
         detection_object.image_filename = filename
         db.session.add(detection_object)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError as exc:
+            orig_exc = str(exc.orig)
+            if 'label' in orig_exc and 'duplicate key' in orig_exc:
+                db.session.rollback()
+                detection_object = models.DetectionObject.query.filter_by(
+                    label=exc.params['label'],
+                ).first()
+            else:
+                raise
         return Response(
             schemas.DetectionObjectSchema().dumps(detection_object),
             HTTPStatus.CREATED,
@@ -111,3 +126,16 @@ class DetectionObjectCreateListView(APIView):
             HTTPStatus.OK,
             headers={'Content-Type': 'application/json'},
         )
+
+
+class DetectionObjectDeleteView(APIView):
+    method_decorators = [jwt_required]
+
+    def delete(self, detection_object_id):
+        detection_object = models.DetectionObject.query.get(
+            detection_object_id,
+        )
+        if detection_object:
+            db.session.delete(detection_object)
+            db.session.commit()
+        return Response(status=HTTPStatus.OK)

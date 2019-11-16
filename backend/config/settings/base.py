@@ -73,28 +73,6 @@ JWT_BLACKLIST_ENABLED = False
 AUTH_USER_MODEL = 'users_user'
 
 
-# CELERY
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='')
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND_URL', default='')
-# TODO: how to add localization to flask?
-# if USE_TZ:
-#     CELERY_TIMEZONE = TIME_ZONE
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-# TODO: set to whatever value is adequate in your circumstances
-CELERYD_TASK_TIME_LIMIT = 5 * 60
-# TODO: set to whatever value is adequate in your circumstances
-CELERYD_TASK_SOFT_TIME_LIMIT = 60
-
-
-# SOCKET.IO
-SOCKETIO_ASYNC_MODE = env('SOCKETIO_ASYNC_MODE', default='eventlet')
-SOCKETIO_CORS_ALLOWED_ORIGINS = '*'
-SOCKETIO_CORS_CREDENTIALS = True
-SOCKETIO_ALWAYS_CONNECT = False
-
-
 # FLASK-UPLOADS
 UPLOADED_FILES_DEST = str(APPS_DIR.path('shared', 'media'))
 UPLOADS_DEFAULT_DEST = UPLOADED_FILES_DEST

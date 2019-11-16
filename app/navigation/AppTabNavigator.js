@@ -9,6 +9,7 @@ import StatsScreen from '../screens/StatsScreen';
 import GameScreen from '../screens/GameScreen';
 import ObjectsScreen from '../screens/ObjectsScreen';
 import ChildScreen from '../screens/ChildScreen';
+import MainWishListScreen from '../screens/wishlist/MainScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -118,15 +119,36 @@ GameStack.navigationOptions = {
 
 GameStack.path = '';
 
-const tabNavigator = createBottomTabNavigator({
+const WishListStack = createStackNavigator(
+  {
+    Stats: MainWishListScreen,
+  },
+  config
+);
+
+WishListStack.navigationOptions = {
+  tabBarLabel: 'Wish List',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-basketball' : 'md-basketball'} />
+  ),
+};
+
+const ParentTabNavigator = createBottomTabNavigator({
   HomeStack,
   ChildStack,
   AddStack,
   ObjectsStack,
   StatsStack,
-  GameStack,
 });
 
-tabNavigator.path = '';
+ParentTabNavigator.path = '';
 
-export default tabNavigator;
+const ChildTabNavigator = createBottomTabNavigator({
+  HomeStack,
+  GameStack,
+  WishListStack,
+});
+
+ChildTabNavigator.path = '';
+
+export default {ParentTabNavigator, ChildTabNavigator};

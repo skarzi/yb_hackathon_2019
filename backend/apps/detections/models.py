@@ -26,7 +26,7 @@ from . import (
 
 
 class DetectionObject(Timestampable, UUIDable):
-    label = Column(String)
+    label = Column(String, unique=True)
     price = Column(Float)
     image_filename = Column(String(length=255), unique=True)
 
