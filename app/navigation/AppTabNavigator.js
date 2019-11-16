@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, createDrawerNavigator } from 'react-navigation';
+import { DrawerItems } from 'react-navigation-drawer';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
@@ -30,8 +31,8 @@ HomeStack.navigationOptions = {
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? `ios-home${focused ? '' : '-outline'}`
+          : 'md-home'
       }
     />
   ),
@@ -49,7 +50,7 @@ const ChildStack = createStackNavigator(
 ChildStack.navigationOptions = {
   tabBarLabel: 'Child',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-stats' : 'md-stats'} />
   ),
 };
 
@@ -65,7 +66,7 @@ const ObjectsStack = createStackNavigator(
 ObjectsStack.navigationOptions = {
   tabBarLabel: 'Add',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-camera' : 'md-camera'} />
   ),
 };
 
@@ -79,9 +80,9 @@ const AddStack = createStackNavigator(
 );
 
 AddStack.navigationOptions = {
-  tabBarLabel: 'Add',
+  tabBarLabel: 'Objects',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-cube' : 'md-cube'} />
   ),
 };
 
@@ -129,7 +130,7 @@ const WishListStack = createStackNavigator(
 WishListStack.navigationOptions = {
   tabBarLabel: 'Wish List',
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-basketball' : 'md-basketball'} />
+    <TabBarIcon focused={focused} name={(Platform.OS === 'ios' ? 'ios-star' : 'md-star') + (focused ? '' :'-outline')} />
   ),
 };
 
