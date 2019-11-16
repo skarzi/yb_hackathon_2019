@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, FlatList, Image, ScrollView, StyleSheet, View, TouchableOpacity, Text, ImageStore, SafeAreaView } from 'react-native';
+import { Button, Platform, FlatList, Image, ScrollView, StyleSheet, View, TouchableOpacity, Text, ImageStore, SafeAreaView } from 'react-native';
 import { Card, ListItem, Icon } from 'react-native-elements';
 
 export default class MainWishListScreen extends React.Component {
@@ -11,18 +11,18 @@ export default class MainWishListScreen extends React.Component {
             tmpBalance: 13,
             ratio: 1.0,
             items: [
-                { key: "Hi", content: "garbage", price: 5, selected: false },
-                { key: "Bye", content: "rubbish", price: 5, selected: false },
-                { key: "Ok", content: "trash", price: 5, selected: false },
-                { key: "Hi1", content: "junk", price: 5, selected: false },
-                { key: "Bye1", content: "coke", price: 5, selected: false },
-                { key: "Ok1", content: "filler", price: 5, selected: false },
-                { key: "Hi2", content: "car", price: 5, selected: false },
-                { key: "Bye2", content: "coke", price: 5, selected: false },
-                { key: "Ok2", content: "filler", price: 5, selected: false },
-                { key: "Hi3", content: "car", price: 5, selected: false },
-                { key: "Bye3", content: "coke", price: 5, selected: false },
-                { key: "Ok3", content: "filler", price: 5, selected: false },
+                { key: "Hi", content: "garbage", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Bye", content: "rubbish", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Ok", content: "trash", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Hi1", content: "junk", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Bye1", content: "coke", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Ok1", content: "filler", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Hi2", content: "car", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Bye2", content: "coke", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Ok2", content: "filler", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Hi3", content: "car", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Bye3", content: "coke", price: 5, selected: false, img: '../../assets/images/logo.png'},
+                { key: "Ok3", content: "filler", price: 5, selected: false, img: '../../assets/images/logo.png'},
             ]
         };
         this.renderthing = this.renderthing.bind(this);
@@ -30,26 +30,23 @@ export default class MainWishListScreen extends React.Component {
     }
 
     renderItem = ({ item, index }) => {
+        let buttonColor = item.selected ? "#a42f51" : "#517fa4";
+        let iconName = (Platform.OS == 'ios' ? 'ios' : 'md') + (item.selected ? '-trash' : '-cart');
 
-        // let title = 
-        let content = index == 0 ? item.content : item.key;
-
-        let buttonColor = item.selected ? "#F00" : "#0F0";
         return <Card
             containerStyle={styles.wish}
-            title={`${item.content} WORLD `}
+            title={`${item.content} `}
+            featuredTitle={`\$${item.price}`}
+            titleStyle={{marginBottom:3, marginTop:2, color: '#f1f1f1', backgroundColor:'#1f1f1f'}}
             image={require('../../assets/images/logo.png')}
             imageStyle={styles.wishImage}
+            contentContainerStyle={{flex:1, flexDiriection:'row'}}
         >
-            <Text style={{ marginBottom: 1 }}>
-                Price: ${item.price}
-            </Text>
-            <Button
-                icon={<Icon name='code' color='#ffffff' />}
-                buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
-                onPress={() => this.toggleItem(item, index)}
-                color= {buttonColor}
-                title='VIEW NOW' />
+            <Icon raised
+                name={iconName}
+                type='ionicon'
+                color={buttonColor}
+                onPress={() => this.toggleItem(item, index)}/>
         </Card >
     }
 
