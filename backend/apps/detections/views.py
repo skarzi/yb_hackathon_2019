@@ -15,6 +15,7 @@ from flask_jwt_extended import (
     current_user,
     jwt_required,
 )
+from PIL import Image
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import FileStorage
@@ -28,7 +29,7 @@ from . import (
     schemas,
     upload_sets,
 )
-from .gcv_api import VisionClient
+from .object_detection import detect_objects
 
 
 class TransactionCreateListView(APIView):
@@ -71,8 +72,8 @@ class ObjectDetectionView(APIView):
     def post(self):
         base64_encoded_image = request.json['image']
         image_data = base64.b64decode(base64_encoded_image)
-        vision_client = VisionClient()
-        response_data = vision_client.localize_objects(image_data)
+        image = Image.open(io.BytesIO(image_data))
+        response_data = detect_objects(image)
         return Response(
             json.dumps(response_data),
             HTTPStatus.OK,
