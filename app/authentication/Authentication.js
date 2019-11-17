@@ -1,5 +1,6 @@
 // Base url of the API
-const baseUrl = "http://vps.skarzi.com"
+//const baseUrl = "http://vps.skarzi.com"
+const baseUrl = "http://92778af4.ngrok.io"
 const baseUsersUrl = "users";
 const baseTokenUrl = "users/auth/tokens";
 const baseQuestion = "questions/random";
@@ -69,13 +70,37 @@ export const getChildren = async (token) => {
 
   if (response.status == 200) {
     let responseJson = await response.json(); 
-    console.log(responseJson); 
     return responseJson.username;
   }
   
   throw new Error(`HTTP Request getChildren failed with status code ${response.status}`);
 }
 
+export const getFirstChild = async (token, retry) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the getFirstChild function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/users/self`, { 
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json(); 
+    if(responseJson.children.length == 0 && retry !== true) {
+      await createChild(token, "Lukas");
+      return await getFirstChild(token, true);
+    }
+    return responseJson.children[0].id;
+  }
+  
+  throw new Error(`HTTP Request getFirstChild failed with status code ${response.status}`);
+}
 
 // Request a token by logging in
 export const getToken = async (username, password) => {
@@ -97,7 +122,7 @@ export const getToken = async (username, password) => {
     cachedToken = responseJson.access_token;
     return responseJson.access_token;
   }
-  
+  console.log(await response.json());
   throw new Error(`HTTP Request getToken failed with status code ${response.status}`);
 }
 
@@ -232,4 +257,117 @@ export const deleteImage = async (token, imageId) => {
   }
   
   throw new Error(`HTTP Request deleteImage failed with status code ${response.status}`);  
+}
+
+export const getBalance = async (token, child_id) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the getBalance function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/users/${child_id}`, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    }
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json();  
+    return responseJson.balance;
+  }
+  
+  throw new Error(`HTTP Request getBalance failed with status code ${response.status}`); 
+
+  // GET /users/id
+}
+
+export const setBalance = async(token, balance) => {
+  let response = await fetch(`${baseUrl}/detection-objects?label=${objectName}`, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    }
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json();  
+    return { price: responseJson.price };
+  }
+  
+  throw new Error(`HTTP Request setBalance failed with status code ${response.status}`); 
+}
+
+export const doTransaction = async(token, userId, objectId) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the doTransaction function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/users/${userId}/transactions`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+    body: JSON.stringify({ type: "EXPENSE", detection_object_id: objectId })
+  });
+
+  if (response.status == 201) {
+    return;
+  }
+  
+  throw new Error(`HTTP Request doTransaction failed with status code ${response.status}`);
+}
+
+export const addBalanceTransaction = async(token, userId, amount) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the doTransaction function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/users/${userId}/transactions`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    },
+    body: JSON.stringify({ type: "INCOME", detection_object_id: objectId })
+  });
+
+  if (response.status == 201) {
+    return;
+  }
+  
+  throw new Error(`HTTP Request doTransaction failed with status code ${response.status}`);
+}
+
+export const getObject = async (token, objectName) => {
+  if (cachedToken.length == "" && token == undefined) {
+    throw new Error('Please provide a token for the getObject function');
+  }
+  const localToken = token || cachedToken;
+
+  let response = await fetch(`${baseUrl}/detection-objects?label=${objectName}`, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localToken}`,
+    }
+  });
+
+  if (response.status == 200) {
+    let responseJson = await response.json(); 
+    if (responseJson.length == 0) {
+      return { price: 0.0, id: -1 }
+    } 
+
+    return { price: responseJson[0].price, id: responseJson[0].id };
+  }
+  
+  throw new Error(`HTTP Request getObject failed with status code ${response.status}`); 
 }

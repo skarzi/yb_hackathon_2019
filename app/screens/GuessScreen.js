@@ -4,19 +4,33 @@ import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 import { addImage, getSavedImagesAndPrices, getToken, submitImage } from "../authentication/Authentication.js";
 import * as ImageManipulator from 'expo-image-manipulator';
-import Svg, {Image, Rect} from 'react-native-svg';
+import Svg, {Image, Rect, Text as SvgText} from 'react-native-svg';
 import layout from "../constants/Layout.js";
 
-export default class AddScreen extends React.Component {
+export default class GuessScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.back,
+    objects: [],
+    correctGuess: null
   };
+  guessResponse = null;
 
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
     this.token = await getToken("frederik", "pw123456");
+    this.updateList();
+    this.props.navigation.addListener('willFocus', (route) => { 
+      this.updateList();
+    });
+  }
+
+  updateList = async () => {
+    let objects = await getSavedImagesAndPrices(this.token);
+    this.setState({
+        objects: objects
+    });
   }
 
   takePhoto = async() => {
@@ -31,56 +45,63 @@ export default class AddScreen extends React.Component {
       this.forceUpdate();
 
       let imageData = image.base64;
-      let imageRects = await submitImage(this.token, imageData, layout.window.width, 400);
+      let initialImageRects = await submitImage(this.token, imageData, layout.window.width, 400);
       
-      // fix issue with big objects overlaying small
-      imageRects.sort((a, b) => {
+      initialImageRects.sort((a, b) => {
         let area1 = (a.x2 - a.x1) * (a.y2 - a.y1);
         let area2 = (b.x2 - b.x1) * (b.y2 - b.y1);
         if(area1 == area2) return 0;
         return area1 < area2 ? 1 : -1;
       });
 
-      await this.setState({imageRects, selectedObject: -1});
+      let imageRects = [];
+      let price = 0;
+      for(let i = 0; i < initialImageRects.length; ++i) {
+        for(let j = 0; j < this.state.objects.length; ++j) {
+          if(this.state.objects[j].label == initialImageRects[i].object) {
+            price = this.state.objects[j].price;
+            break;
+          }
+        }
+        if(price > 0) {
+          imageRects.push(initialImageRects[i]);
+          break;
+        }
+      }
+
+      if(price <= 0) {
+        this.guessResponse = <Text>Invalid photo, try to take another one</Text>;
+      } else {
+        await this.setState({imageRects, selectedObject: -1, correctPrice: price});
+      }
     }
   }
 
   takeNewPhoto = () => {
-    this.setState({image: null, price: 0.1});
+    this.guessResponse = null;
+    this.setState({image: null, price: 0.1, correctGuess: null});
   }
 
-  addPhoto = async () => {
-    let selectedCrop = this.state.imageRects[this.state.selectedObject];
-    let x1 = selectedCrop.x1 / layout.window.width * 640 - 20;
-    let x2 = selectedCrop.x2 / layout.window.width * 640 + 20;
-    let y1 = selectedCrop.y1 / 400 * 480 - 20;
-    let y2 = selectedCrop.y2 / 400 * 480 + 20;
-    let cropWidth = x2 - x1;
-    let cropHeight = y2 - y1;
-    let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}},  {crop: { originX: x1, originY: y1, width: cropWidth, height: cropHeight}}], {base64: true});
-    let imageData = image.base64;
+  wrongGuess = () => {
+    this.guessResponse = <Text style={{textAlign: 'center', fontSize: 20}}>Wrong guess! Try again later :)</Text>
+    this.setState({correctGuess: false})
+  }
 
-    await addImage(this.token, imageData, this.state.price, selectedCrop.object);
-    this.takeNewPhoto();
+  addGuess = async () => {
+    if(this.state.correctPrice * 0.9 - 1 > this.state.price) {
+      return this.wrongGuess();
+    }
+    if(this.state.correctPrice * 1.1 + 1 < this.state.price) {
+      return this.wrongGuess();
+    }
+    // correct guess
+    this.guessResponse = <Text style={{textAlign: 'center', fontSize: 20}}>Correct guess! Good job!</Text>
+    this.setState({correctGuess: true})
   }
 
   sliderValueChange = (val) => {
     val = Math.floor(Math.pow((val / 2),2) * 10) / 10;
     this.setState({price: val});
-  }
-
-  selectObject = (index, name) => {
-    if(this.state.selectedObject == index) {
-      this.setState({
-        selectedObject: -1,
-        price: 0.1
-      });
-      return;
-    }
-    this.setState({
-      selectedObject: index,
-      selectedObjectName: name
-    });
   }
 
   render() {
@@ -105,16 +126,30 @@ export default class AddScreen extends React.Component {
     let rects = [];
     for(let i = 0; i < this.state.imageRects.length; ++i) {
       let rect = this.state.imageRects[i];
-      rects.push(<Rect key={"Rect" + i} x={(rect.x1)} y={(rect.y1)}
-        width={(rect.x2-rect.x1)} height={(rect.y2-rect.y1)} fill="none" strokeWidth="3" 
-        stroke={this.state.selectedObject == i ? "green" : "red"} onPress={() => { this.selectObject(i, rect.object); }} />);
+      if(this.state.correctGuess === null) {
+        rects.push(<Rect key={"Rect" + i} x={(rect.x1)} y={(rect.y1)}
+          width={(rect.x2-rect.x1)} height={(rect.y2-rect.y1)} fill="none" strokeWidth="3" 
+          stroke="green" />);
+      } else if(this.state.correctGuess === true) {
+        rects.push(<Rect key={"Rect" + i} x={(rect.x1)} y={(rect.y1)}
+          width={(rect.x2-rect.x1)} height={(rect.y2-rect.y1)} fill="none" strokeWidth="7" 
+          stroke="green" />);
+          rects.push(<SvgText key="text" x="50%" y="50%" fontSize="40" textAnchor="middle" fontWeight="bold" fill="green"
+          stroke="green">CORRECT!</SvgText>)
+      } else {
+        rects.push(<Rect key={"Rect" + i} x={(rect.x1)} y={(rect.y1)}
+          width={(rect.x2-rect.x1)} height={(rect.y2-rect.y1)} fill="none" strokeWidth="7" 
+          stroke="red" />);
+        rects.push(<SvgText key="text" x="50%" y="50%" fontSize="40" textAnchor="middle" fontWeight="bold" fill="red"
+          stroke="red">Wrong!</SvgText>)
+      }
     }
 
-    let objectSelection = <View style={styles.optionView}><Text style={styles.infoText}>Select an object</Text></View>;
-    if(this.state.selectedObject >= 0) {
+    let objectSelection = <View style={styles.optionView}><Text style={styles.infoText}>Searching for the objects</Text></View>;
+    if(this.state.correctPrice > 0 && !this.guessResponse) {
       objectSelection = <View>
           <View style={styles.optionView}>
-            <Text style={styles.infoText}>Selected object: {this.state.selectedObjectName}</Text>
+            <Text style={styles.infoText}>What's the price of that?</Text>
             <Text style={{fontSize: 20, paddingTop: 10}}>Price: {this.state.price}$</Text>
             <Slider
               style={{width: 300, height: 40}}
@@ -126,8 +161,8 @@ export default class AddScreen extends React.Component {
               onValueChange={this.sliderValueChange}
             />
           </View>
-          <TouchableOpacity style={styles.button} onPress={this.addPhoto}>
-              <Text style={styles.buttonText}>Add</Text>
+          <TouchableOpacity style={styles.button} onPress={this.addGuess}>
+              <Text style={styles.buttonText}>Guess the price!</Text>
           </TouchableOpacity>
         </View>;
     }
@@ -145,14 +180,14 @@ export default class AddScreen extends React.Component {
         <TouchableOpacity style={styles.button} onPress={this.takeNewPhoto}>
             <Text style={styles.buttonText}>Take another photo</Text>
         </TouchableOpacity>
-        {objectSelection}
+        {this.guessResponse ? this.guessResponse : objectSelection}
       </ScrollView>      
     );
   }
 }
 
-AddScreen.navigationOptions = {
-  title: 'Add new object',
+GuessScreen.navigationOptions = {
+  title: 'Guess the price!',
 };
 
 const styles = StyleSheet.create({

@@ -2,12 +2,12 @@ import React from 'react';
 import { FlatList, Image as ImageNative, ScrollView, StyleSheet, View, TouchableOpacity, Text, Slider } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
-import { addImage, getSavedImagesAndPrices, getToken, submitImage } from "../authentication/Authentication.js";
+import { doTransaction, getFirstChild, getBalance, getObject, getToken, submitImage } from "../authentication/Authentication.js";
 import * as ImageManipulator from 'expo-image-manipulator';
 import Svg, {Image, Rect} from 'react-native-svg';
 import layout from "../constants/Layout.js";
 
-export default class AddScreen extends React.Component {
+export default class BuyScreen extends React.Component {
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.back,
@@ -17,30 +17,30 @@ export default class AddScreen extends React.Component {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
     this.token = await getToken("frederik", "pw123456");
+    this.childId = await getFirstChild(this.token);
+    this.updateBalance();
+
+    this.props.navigation.addListener('willFocus', (route) => { 
+        this.updateBalance();
+    });
+  }
+
+  updateBalance = async () => {
+    let balance = await getBalance(this.token, this.childId);
+    this.setState({ balance })
   }
 
   takePhoto = async() => {
     if (this.camera) {
+      console.log("take");
       this.last_photo = await this.camera.takePictureAsync();
-      if(!this.last_photo) {
-        throw Error("Can't take photo");
-        return;
-      }
+
       let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}}], {base64: true});
-      await this.setState({image: image.uri, price: 0.1, imageRects: [], selectedObject: -1});
-      this.forceUpdate();
 
       let imageData = image.base64;
       let imageRects = await submitImage(this.token, imageData, layout.window.width, 400);
       
-      // fix issue with big objects overlaying small
-      imageRects.sort((a, b) => {
-        let area1 = (a.x2 - a.x1) * (a.y2 - a.y1);
-        let area2 = (b.x2 - b.x1) * (b.y2 - b.y1);
-        if(area1 == area2) return 0;
-        return area1 < area2 ? 1 : -1;
-      });
-
+      await this.setState({image: image.uri, price: 0.1, imageRects: [], selectedObject: -1});
       await this.setState({imageRects, selectedObject: -1});
     }
   }
@@ -49,38 +49,32 @@ export default class AddScreen extends React.Component {
     this.setState({image: null, price: 0.1});
   }
 
-  addPhoto = async () => {
-    let selectedCrop = this.state.imageRects[this.state.selectedObject];
-    let x1 = selectedCrop.x1 / layout.window.width * 640 - 20;
-    let x2 = selectedCrop.x2 / layout.window.width * 640 + 20;
-    let y1 = selectedCrop.y1 / 400 * 480 - 20;
-    let y2 = selectedCrop.y2 / 400 * 480 + 20;
-    let cropWidth = x2 - x1;
-    let cropHeight = y2 - y1;
-    let image = await ImageManipulator.manipulateAsync(this.last_photo.uri, [{resize: {width: 640}},  {crop: { originX: x1, originY: y1, width: cropWidth, height: cropHeight}}], {base64: true});
-    let imageData = image.base64;
 
-    await addImage(this.token, imageData, this.state.price, selectedCrop.object);
-    this.takeNewPhoto();
-  }
-
-  sliderValueChange = (val) => {
-    val = Math.floor(Math.pow((val / 2),2) * 10) / 10;
-    this.setState({price: val});
-  }
-
-  selectObject = (index, name) => {
+  selectObject = async (index, name) => {
     if(this.state.selectedObject == index) {
       this.setState({
         selectedObject: -1,
-        price: 0.1
+        price: 0.1,
+        selectedObjectPrice: 0.0,
       });
       return;
     }
+
+    const selectedObjectInfo = await getObject(this.token, name);
     this.setState({
       selectedObject: index,
-      selectedObjectName: name
+      selectedObjectName: name,
+      selectedObjectPrice: selectedObjectInfo.price,
+      selectedObjectId: selectedObjectInfo.id
     });
+  }
+
+  buyObject = async () => {
+    console.log("BUY OBJECT", this.state.selectedObjectId);
+    let transaction = await doTransaction(this.token, this.childId, this.state.selectedObjectId);
+    this.updateBalance();
+    this.takeNewPhoto();
+
   }
 
   render() {
@@ -94,10 +88,14 @@ export default class AddScreen extends React.Component {
     if(!this.state.image) {
       return (
         <ScrollView style={styles.container}>
-          <Camera style={{ flex: 1, height: 400 }} type={this.state.type} ref={ref => { this.camera = ref; }} />
+          <Camera style={{ flex: 1, height: 400 }} type={this.state.type}
+            pictureSize="640x480" ratio="4:3" ref={ref => { this.camera = ref; }} />
           <TouchableOpacity style={styles.button} onPress={this.takePhoto}>
             <Text style={styles.buttonText}>Take photo</Text>
           </TouchableOpacity>
+          <Text style={ styles.header }>
+            Balance: {this.state.balance}
+          </Text>
         </ScrollView>
       );
     }
@@ -111,23 +109,24 @@ export default class AddScreen extends React.Component {
     }
 
     let objectSelection = <View style={styles.optionView}><Text style={styles.infoText}>Select an object</Text></View>;
-    if(this.state.selectedObject >= 0) {
+    let moneyText = this.state.selectedObjectName + " is not for sale";
+    if (this.state.selectedObjectPrice > 0.0) {
+      moneyText = this.state.selectedObjectName + " costs " + this.state.selectedObjectPrice;
+    }
+
+    let balanceAfterBuy = this.state.balance - this.state.selectedObjectPrice;
+    let buyStyle = (this.state.selectedObjectPrice > 0.0 && balanceAfterBuy >= 0) ? styles.buttonBuy : styles.buttonNoBuy;
+    let buyText = (this.state.selectedObjectPrice > 0.0 && balanceAfterBuy >= 0) ? "Buy" : "Can't Buy";
+    let buyFunc = (this.state.selectedObjectPrice > 0.0 && balanceAfterBuy >= 0) ? () => { this.buyObject(); } : () => {};
+
+    if (this.state.selectedObject >= 0) {
       objectSelection = <View>
           <View style={styles.optionView}>
-            <Text style={styles.infoText}>Selected object: {this.state.selectedObjectName}</Text>
-            <Text style={{fontSize: 20, paddingTop: 10}}>Price: {this.state.price}$</Text>
-            <Slider
-              style={{width: 300, height: 40}}
-              minimumValue={1}
-              maximumValue={100}
-              step={0.1}
-              minimumTrackTintColor="#111111"
-              maximumTrackTintColor="#000000"
-              onValueChange={this.sliderValueChange}
-            />
+            <Text style={styles.infoText}>{moneyText}</Text>
+            { (this.state.selectedObjectPrice > 0.0 && balanceAfterBuy >= 0) && <Text style={styles.infoText}>Balance after buy: {balanceAfterBuy}</Text> }
           </View>
-          <TouchableOpacity style={styles.button} onPress={this.addPhoto}>
-              <Text style={styles.buttonText}>Add</Text>
+          <TouchableOpacity style={styles.button} onPress={buyFunc}>
+              <Text style={buyStyle}>{buyText}</Text>
           </TouchableOpacity>
         </View>;
     }
@@ -151,8 +150,8 @@ export default class AddScreen extends React.Component {
   }
 }
 
-AddScreen.navigationOptions = {
-  title: 'Add new object',
+BuyScreen.navigationOptions = {
+  title: 'Buy an object',
 };
 
 const styles = StyleSheet.create({
@@ -172,6 +171,16 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
+    padding: 10
+  },
+  buttonBuy: {
+    alignItems: 'center',
+    backgroundColor: '#00FF00',
+    padding: 10
+  },
+  buttonNoBuy: {
+    alignItems: 'center',
+    backgroundColor: '#FF0000',
     padding: 10
   },
   buttonText: {
